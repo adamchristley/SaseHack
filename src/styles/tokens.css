@@ -1,0 +1,37 @@
+/*
+ * MTU palette — Michigan Tech black and gold.
+ * The whole visual identity lives here so it's ONE edit later.
+ * TODO(team): confirm exact hex from mtu.edu brand page before the pitch.
+ * Current values are Michigan Tech's published gold + black.
+ */
+:root {
+  /* Brand */
+  --mtu-gold: #ffcb05;        /* primary accent */
+  --mtu-gold-deep: #d9a900;   /* darker gold for hover/borders */
+  --mtu-black: #000000;
+  --mtu-charcoal: #16181d;    /* panels on the dark canvas */
+
+  /* Neutrals */
+  --bg: #0c0d10;
+  --surface: #16181d;
+  --surface-2: #1e2128;
+  --border: #2b2f38;
+  --text: #f4f5f7;
+  --text-dim: #a7adba;
+  --text-faint: #6b7280;
+
+  /* Semantic */
+  --good: #37b26b;      /* verified / fresh */
+  --warn: #e0a030;      /* verify soon */
+  --bad: #e0533d;       /* stale / expired */
+  --info: #5b9bd5;
+
+  /* Shape */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --maxw: 1040px;
+
+  /* Type */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
