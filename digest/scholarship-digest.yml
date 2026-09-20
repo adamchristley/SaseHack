@@ -1,0 +1,97 @@
+name: Scholarship Digest
+
+# HOW OFTEN THIS CAN RUN
+# GitHub cannot schedule anything more often than every 5 minutes, and scheduled runs are
+# best-effort. So "every minute" is done another way: each run stays alive ~32 minutes and
+# sends once a minute, and a new run is scheduled every 30 minutes. Runs never overlap
+# (see `concurrency`), so the next one starts the moment the last one ends.
+#
+# THIS IS A DEMO MODE. It runs around the clock and uses ~1,440 Actions minutes a day
+# (free for public repos; a private repo's monthly allowance is gone in about a day).
+# GitHub asks that Actions not be used as an always-on server, so use it for a short demo
+# window only, then switch to the PRODUCTION values below.
+#
+# STOP IT ANY TIME: Settings > Secrets and variables > Actions > Variables > add
+# DIGEST_PAUSED = true (or use the "..." menu on this workflow > Disable workflow).
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'      # PRODUCTION: '0 14 * * 1'  (Mondays 14:00 UTC = 10:00 Eastern in summer)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Show who would be emailed, but send nothing'
+        type: boolean
+        default: false
+      only_email:
+        description: 'Only email this address (blank = use the value in the workflow file)'
+        type: string
+        required: false
+      min_minutes:
+        description: 'Skip people emailed in the last N minutes (0 = always send; blank = workflow default)'
+        type: string
+        required: false
+      passes:
+        description: 'How many times to run, one minute apart (blank = workflow default)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+# Never let two digest runs overlap; the next one waits its turn.
+concurrency:
+  group: scholarship-digest
+  cancel-in-progress: false
+
+env:
+  # DEMO MODE (current)                 # PRODUCTION
+  MIN_MINUTES_BETWEEN: '1'              # '10080'   (one week)
+  PASSES_PER_RUN: '32'                  # '1'
+  ONLY_EMAIL: 'woodwmaxwell@gmail.com'  # ''        (empty = EVERY opted-in user)
+
+jobs:
+  send-digest:
+    if: ${{ vars.DIGEST_PAUSED != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: digest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+
+      # Use the scholarship data and matching rules the website uses right now.
+      - name: Sync data from the app
+        run: node sync-data.mjs
+
+      # If the app's data or rules change shape, stop here instead of sending wrong emails.
+      - name: Run tests
+        run: npm test
+
+      - name: Send digests
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SITE_URL: https://login-sasehack.web.app
+          MIN_MINUTES_BETWEEN: ${{ inputs.min_minutes || env.MIN_MINUTES_BETWEEN }}
+          ONLY_EMAIL: ${{ inputs.only_email || env.ONLY_EMAIL }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          PASSES: ${{ inputs.passes || env.PASSES_PER_RUN }}
+        run: |
+          failed=0
+          start=$(date +%s)
+          for i in $(seq 1 "$PASSES"); do
+            echo "=== pass $i of $PASSES ==="
+            node send-digest.js || failed=1
+            # keep a steady 60-second rhythm instead of "60 seconds after the last pass finished"
+            target=$((start + i * 60))
+            now=$(date +%s)
+            if [ "$i" -lt "$PASSES" ] && [ "$target" -gt "$now" ]; then sleep $((target - now)); fi
+          done
+          exit $failed

@@ -70,7 +70,26 @@ export function formatDeadline(s, today = new Date()) {
   return `Due ${nice}`
 }
 
-export function buildEmail({ name, matches, siteUrl, today = new Date() }) {
+// "junior · computer science · GPA 3.6 · MI": shows in the email which saved profile it was built from.
+export function profileSummary(profile) {
+  const p = profile || {}
+  const bits = []
+  if (Array.isArray(p.majors) && p.majors.length) bits.push(p.majors.join(', '))
+  if (p.year_level) bits.push(p.year_level)
+  if (p.gpa != null && p.gpa !== '') bits.push(`GPA ${p.gpa}`)
+  if (p.state) bits.push(p.state)
+  if (Array.isArray(p.affiliations) && p.affiliations.length) bits.push(p.affiliations.join(', '))
+  return bits.join(' · ')
+}
+
+export function formatSentAt(now = new Date()) {
+  return now.toLocaleString('en-US', {
+    timeZone: 'America/Detroit', month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+  })
+}
+
+export function buildEmail({ name, matches, siteUrl, profile, today = new Date(), now = new Date() }) {
   const first = String(name || '').trim().split(/\s+/)[0]
   const count = matches.length
   const subject = `Your ${count} best scholarship match${count === 1 ? '' : 'es'} this week`
@@ -78,7 +97,10 @@ export function buildEmail({ name, matches, siteUrl, today = new Date() }) {
   const hello = first ? `Hi ${first},` : 'Hi,'
   const intro = "Here are the scholarships you may be eligible for, based on the profile you saved."
   const disclaimer = "Matches use the facts in your saved profile. Requirements and deadlines change, so confirm them on the official page before you apply. We can't guarantee you'll qualify."
-  const footer = `You're getting this because you opted in on Charge Up Savings. To turn it off, open ${appUrl}, go to the Account tab, and untick the email box.`
+  const basedOn = profileSummary(profile)
+  const basedOnLine = basedOn ? `Based on your saved profile: ${basedOn}` : ''
+  const sentLine = `Sent ${formatSentAt(now)}.`
+  const footer = `You're getting this because you opted in on Charge Up Savings. To turn it off, open ${appUrl}, go to the Account tab, and untick the email box. ${sentLine}`
 
   const items = matches.map((m) => {
     const s = m.scholarship
@@ -93,7 +115,7 @@ export function buildEmail({ name, matches, siteUrl, today = new Date() }) {
   })
 
   const text = [
-    hello, '', intro, '',
+    hello, '', intro, basedOnLine, '',
     ...items.flatMap((it, i) => [
       `${i + 1}. ${it.name}${it.sponsor ? ` (${it.sponsor})` : ''}`,
       [it.amount, it.deadline].filter(Boolean).join(' · '),
@@ -108,7 +130,8 @@ export function buildEmail({ name, matches, siteUrl, today = new Date() }) {
 <html><body style="margin:0;padding:0;background:#f4f5f7;">
 <div style="max-width:600px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;color:#16181d;line-height:1.5;">
   <p style="margin:0 0 8px;font-size:16px;">${escapeHtml(hello)}</p>
-  <p style="margin:0 0 20px;font-size:15px;color:#444;">${escapeHtml(intro)}</p>
+  <p style="margin:0 0 ${basedOn ? '6px' : '20px'};font-size:15px;color:#444;">${escapeHtml(intro)}</p>
+  ${basedOn ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">${escapeHtml(basedOnLine)}</p>` : ''}
 ${items.map((it) => `  <div style="background:#ffffff;border:1px solid #e2e4e9;border-radius:10px;padding:16px;margin:0 0 14px;">
     <div style="font-size:17px;font-weight:bold;">${escapeHtml(it.name)}</div>
     ${it.sponsor ? `<div style="font-size:13px;color:#6b7280;">${escapeHtml(it.sponsor)}</div>` : ''}
@@ -117,7 +140,7 @@ ${items.map((it) => `  <div style="background:#ffffff;border:1px solid #e2e4e9;b
     ${it.url ? `<a href="${escapeHtml(it.url)}" style="font-size:14px;font-weight:bold;color:#1a5fb4;">Official page</a>` : ''}
   </div>`).join('\n')}
   <p style="margin:20px 0 8px;font-size:12px;color:#6b7280;">${escapeHtml(disclaimer)}</p>
-  <p style="margin:0;font-size:12px;color:#6b7280;">You're getting this because you opted in on Charge Up Savings. To turn it off, <a href="${escapeHtml(appUrl)}" style="color:#6b7280;">open the app</a>, go to the Account tab, and untick the email box.</p>
+  <p style="margin:0;font-size:12px;color:#6b7280;">You're getting this because you opted in on Charge Up Savings. To turn it off, <a href="${escapeHtml(appUrl)}" style="color:#6b7280;">open the app</a>, go to the Account tab, and untick the email box. ${escapeHtml(sentLine)}</p>
 </div>
 </body></html>`
 

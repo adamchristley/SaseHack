@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import scholarships from './scholarships.js'
-import { isDue, toMillis, pickMatches, buildEmail, formatAmount, formatDeadline, escapeHtml, MAX_ITEMS } from './digest-lib.js'
+import { isDue, toMillis, pickMatches, buildEmail, formatAmount, formatDeadline, escapeHtml, profileSummary, formatSentAt, MAX_ITEMS } from './digest-lib.js'
 
 const today = new Date('2026-09-20T12:00:00')
 const profile = {
@@ -80,4 +80,26 @@ test('formatAmount / formatDeadline', () => {
   assert.equal(formatAmount({}), '')
   assert.match(formatDeadline({ deadline: '2026-09-25' }, today), /Due in 5 days/)
   assert.equal(formatDeadline({ deadline: null, recurring: true }, today), 'Rolling / annual')
+})
+
+test('profileSummary: shows which saved profile the email was built from', () => {
+  assert.equal(profileSummary(profile), 'computer science · junior · GPA 3.6 · MI · SASE, first-generation')
+  assert.equal(profileSummary({}), '')
+  assert.equal(profileSummary(null), '')
+})
+
+test('buildEmail: includes the profile it was based on and when it was sent', () => {
+  const picks = pickMatches(scholarships, profile, { today })
+  const now = new Date('2026-09-20T22:15:00Z')
+  const { text, html } = buildEmail({ name: 'Max', matches: picks, siteUrl: 'https://x.web.app', profile, today, now })
+  assert.match(text, /Based on your saved profile: computer science · junior/)
+  assert.match(text, /Sent Sep 20, 2026, 6:15 PM/)
+  assert.match(html, /Based on your saved profile/)
+  assert.match(formatSentAt(now), /Sep 20, 2026/)
+})
+
+test('buildEmail: without a profile there is no "based on" line', () => {
+  const picks = pickMatches(scholarships, profile, { today })
+  const { text } = buildEmail({ name: 'Max', matches: picks, siteUrl: 'https://x.web.app', today })
+  assert.ok(!text.includes('Based on your saved profile'))
 })

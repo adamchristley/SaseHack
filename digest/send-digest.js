@@ -100,7 +100,7 @@ for (const docSnap of snap.docs) {
     const matches = pickMatches(scholarships, data.profile)
     if (matches.length === 0) { skipped++; console.log(`${label}: skipped (no confirmed matches for this profile)`); continue }
 
-    const { subject, text, html } = buildEmail({ name: account.displayName, matches, siteUrl: SITE_URL })
+    const { subject, text, html } = buildEmail({ name: account.displayName, matches, siteUrl: SITE_URL, profile: data.profile })
 
     if (DRY_RUN) {
       console.log(`${label}: would send "${subject}"`)
