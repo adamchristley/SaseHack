@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { createGenAI, friendlyGeminiError, withGeminiRetry } from './genai-client.js'
 
 const MODEL = 'gemini-embedding-2'
 const OUTPUT_DIMENSIONS = 768
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     text: String(doc.text || '').slice(0, MAX_TEXT_CHARS),
   }))
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+  const ai = createGenAI(process.env.GEMINI_API_KEY)
 
   try {
     const cacheKey = cleaned
@@ -46,14 +46,14 @@ export default async function handler(req, res) {
 
     let documentVectors = documentCache.vectors
     if (!cacheHit) {
-      const documentResult = await ai.models.embedContent({
+      const documentResult = await withGeminiRetry(() => ai.models.embedContent({
         model: MODEL,
         contents: cleaned.map((doc) => ({ parts: [{ text: doc.text }] })),
         config: {
           taskType: 'SEMANTIC_SIMILARITY',
           outputDimensionality: OUTPUT_DIMENSIONS,
         },
-      })
+      }))
 
       const documentEmbeddings = documentResult.embeddings || []
       if (documentEmbeddings.length !== cleaned.length) {
@@ -64,14 +64,14 @@ export default async function handler(req, res) {
       documentCache = { key: cacheKey, vectors: documentVectors }
     }
 
-    const queryResult = await ai.models.embedContent({
+    const queryResult = await withGeminiRetry(() => ai.models.embedContent({
       model: MODEL,
       contents: [{ parts: [{ text: query.slice(0, MAX_TEXT_CHARS) }] }],
       config: {
         taskType: 'SEMANTIC_SIMILARITY',
         outputDimensionality: OUTPUT_DIMENSIONS,
       },
-    })
+    }))
 
     const queryVector = queryResult.embeddings?.[0]?.values || []
     if (!queryVector.length) {
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Semantic ranking endpoint error', error)
     return res.status(502).json({
-      error: error instanceof Error ? error.message : 'Gemini semantic ranking failed.',
+      error: friendlyGeminiError(error),
       code: 'GEMINI_UPSTREAM_ERROR',
     })
   }
