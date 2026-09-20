@@ -8,6 +8,7 @@ import ScholarshipCard from '../components/ScholarshipCard.jsx'
 
 const EMPTY_PROFILE = {
   majors: [], year_level: null, gpa: null, state: null, school: null,
+  age: null, citizenship: null, graduate_plan: null,
   affiliations: [], skills: [], interests: [], work_experience: [],
 }
 
@@ -17,6 +18,9 @@ const SAMPLE_PROFILE = {
   gpa: 3.6,
   state: 'MI',
   school: 'Michigan Technological University',
+  age: 21,
+  citizenship: 'us_citizen',
+  graduate_plan: 'phd',
   affiliations: ['SASE', 'first-generation'],
   skills: ['python', 'docker', 'postgres'],
   interests: ['systems programming', 'networking'],
