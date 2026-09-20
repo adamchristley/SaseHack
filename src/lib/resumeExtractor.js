@@ -40,6 +40,9 @@ const SKILLS = [
   'firebase', 'supabase', 'docker', 'kubernetes', 'jenkins', 'git', 'github',
   'linux', 'aws', 'azure', 'gcp', 'tensorflow', 'pytorch', 'scikit-learn',
   'pandas', 'numpy', 'opencv', 'langchain', 'rest api', 'graphql',
+  'opensearch', 'milvus', 'openshift', 'terraform', 'transformers',
+  'cnns', 'vits', 'snns', 'rag', 'embeddings', 'vector search',
+  'k-nn', 'cross-encoder reranking', 'jupyter notebooks',
   'embedded systems', 'arm assembly', 'stm32', 'verilog', 'vhdl',
 ]
 
@@ -62,6 +65,14 @@ const INTEREST_TERMS = [
   'game development',
   'computer vision',
   'natural language processing',
+  'retrieval augmented generation',
+  'rag',
+  'semantic search',
+  'vector search',
+  'neural decoding',
+  'signal processing',
+  'medical imaging',
+  'autonomous robotics',
 ]
 
 const AFFILIATIONS = [
@@ -150,7 +161,7 @@ export function analyzeResumeText(rawText) {
 
   const profile = {
     majors: findPhrases(textLower, MAJORS),
-    year_level: findYearLevel(textLower),
+    year_level: findYearLevel(textLower) || inferYearLevelFromGraduation(text),
     gpa: findGpa(text),
     state: findState(lines),
     school: findSchool(lines),
@@ -175,6 +186,7 @@ export function analyzeResumeText(rawText) {
         .filter(([, value]) => Array.isArray(value) ? value.length > 0 : value != null)
         .map(([key]) => key),
       missing_fields: missing,
+      derived_fields: findYearLevel(textLower) ? [] : (profile.year_level ? ['year level from expected graduation'] : []),
     },
   }
 }
@@ -212,7 +224,9 @@ function findYearLevel(textLower) {
 }
 
 function findState(lines) {
-  const header = lines.slice(0, 12).join(' ')
+  // Residency state is an eligibility field. Only inspect the contact header,
+  // never school or employer locations later in the resume.
+  const header = lines.slice(0, 3).join(' ')
   const codes = STATE_CODES.join('|')
   const match = header.match(new RegExp(`(?:,|\\s)\\s*(${codes})(?=\\s|\\d|$)`, 'i'))
   return match ? match[1].toUpperCase() : null
@@ -225,8 +239,11 @@ function findSchool(lines) {
   )
   if (!schoolLine) return null
 
-  return schoolLine
-    .replace(/\s{2,}.*/, '')
+  const institution = schoolLine.match(
+    /^(.+?\b(?:University|College|Institute of Technology|Polytechnic)\b)/i,
+  )
+
+  return (institution?.[1] || schoolLine)
     .replace(/\b(expected|graduation|gpa)\b.*$/i, '')
     .trim()
     .slice(0, 120) || null
@@ -246,4 +263,25 @@ function findWorkExperience(lines) {
       /\b(intern|engineer|developer|researcher|research assistant|analyst|technician|consultant|assistant)\b/i.test(line)
     )
   ).slice(0, 8)
+}
+
+
+function inferYearLevelFromGraduation(text, today = new Date()) {
+  const match = text.match(
+    /(?:expected\s+graduation|graduation|expected)\s*[,\-:]?\s*(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)?\s*(20\d{2})/i,
+  )
+  if (!match) return null
+
+  const monthNames = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+  const month = match[1] ? monthNames.findIndex((m) => match[1].toLowerCase().startsWith(m)) : 4
+  const graduation = new Date(Number(match[2]), month >= 0 ? month : 4, 1)
+  const months = (graduation.getFullYear() - today.getFullYear()) * 12 +
+    (graduation.getMonth() - today.getMonth())
+
+  if (months < -3) return 'grad'
+  if (months <= 12) return 'senior'
+  if (months <= 24) return 'junior'
+  if (months <= 36) return 'sophomore'
+  if (months <= 54) return 'freshman'
+  return null
 }
