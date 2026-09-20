@@ -86,9 +86,9 @@ Rules:
 - If a scalar fact is unsupported, return null for value and evidence.
 - Normalize majors to common degree names.
 - year_level must be freshman, sophomore, junior, senior, grad, or null.
-- Do not guess year_level only from graduation year.
+- You may derive year_level from an explicit expected graduation date relative to September 2026. If graduation is Apr/May 2027, use senior. Include the graduation text as evidence.
 - Only return GPA when explicitly stated.
-- Normalize state to a two-letter US state code when supported.
+- state means the student's residency/home state for scholarship eligibility. Do not use a school location or employer location as residency. Return null unless residency/home location is explicit.
 - Affiliations must be explicitly stated organizations, programs, or statuses.
 - Do not infer demographic or other sensitive personal attributes.
 - Skills must be concrete and resume-supported.
@@ -120,7 +120,7 @@ ${text}
   } catch (error) {
     console.error('Resume analysis endpoint error', error)
     return res.status(502).json({
-      error: 'Gemini resume extraction failed.',
+      error: error instanceof Error ? error.message : 'Gemini resume extraction failed.',
       code: 'GEMINI_UPSTREAM_ERROR',
     })
   }
