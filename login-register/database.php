@@ -1,11 +1,10 @@
 <?php
+$hostName   = "localhost";
+$dbUser     = "CHANGE_ME_db_user";      /
+$dbPassword = "CHANGE_ME_db_password";  
+$dbName     = "CHANGE_ME_db_name";
 
-$hostName = "localhost";
-$dbUser = "root";
-$dbPassword = "";
-$dbName = "login_register";
 $conn = mysqli_connect($hostName, $dbUser, $dbPassword, $dbName);
 if (!$conn) {
-    die("something went wrong");
+    die("Something went wrong");
 }
-?>
