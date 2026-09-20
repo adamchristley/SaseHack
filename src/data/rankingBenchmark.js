@@ -176,7 +176,7 @@ export const rankingBenchmark = [
       school: 'State University',
       age: 22,
       citizenship: 'us_citizen',
-      graduate_plan: 'research_grad',
+      graduate_plan: 'phd',
       affiliations: [],
       skills: ['research', 'python'],
       interests: ['applied physics', 'international research'],
