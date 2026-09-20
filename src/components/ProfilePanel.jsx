@@ -54,7 +54,7 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
           />
         </Field>
 
-        <Field label="State" hint="2-letter">
+        <Field label="Residency state" hint="2-letter, confirm manually">
           <input
             value={profile.state || ''}
             onChange={(e) => set({ state: e.target.value.toUpperCase().slice(0, 2) || null })}
@@ -70,11 +70,11 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
           />
         </Field>
 
-        <Field label="Affiliations" hint="SASE, first-generation, veteran…" wide>
+        <Field label="Affiliations / eligibility groups" hint="only add what you want to self-declare" wide>
           <input
             value={fromList(profile.affiliations)}
             onChange={(e) => set({ affiliations: toList(e.target.value) })}
-            placeholder="SASE, first-generation"
+            placeholder="SASE, veteran, first-generation"
           />
         </Field>
 
