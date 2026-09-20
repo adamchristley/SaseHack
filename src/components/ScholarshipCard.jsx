@@ -2,7 +2,7 @@
 // rule signals. Optional retrieval diagnostics expose how hybrid search ranked it.
 
 export default function ScholarshipCard({ match, rank }) {
-  const { scholarship: s, score, reasons, retrieval } = match
+  const { scholarship: s, score, reasons, retrieval, eligibility } = match
   const deadline = formatDeadline(s.deadline, s.recurring)
 
   return (
@@ -20,6 +20,13 @@ export default function ScholarshipCard({ match, rank }) {
           </span>
         </div>
       </div>
+
+      {eligibility?.status === 'needs_info' && (
+        <div className="eligibility-warning">
+          <strong>Needs more information</strong>
+          <span>{eligibility.unknown.join(', ')}</span>
+        </div>
+      )}
 
       {s.description && <p className="card-summary">{s.description}</p>}
 
