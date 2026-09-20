@@ -151,4 +151,12 @@ student profiles with 0-3 relevance judgments and is intentionally a hackathon
 validation set, not evidence of production-quality generalization. Review the
 labels as a team before quoting benchmark results in the pitch.
 
-The tuner requires `GEMINI_API_KEY` because it computes semantic embeddings, then prints the best weight triple to copy into `src/data/rankingWeights.js`.
+The tuner requires `GEMINI_API_KEY` because it computes semantic embeddings. On the current 10-profile graded validation set, Bayesian optimization improved mean nDCG@5 from **0.9248** with the original hand-set weights to **0.9579** with:
+
+```
+rules:    0.0136
+rrf:      0.0897
+semantic: 0.8967
+```
+
+Those tuned values are now used at runtime in `src/data/rankingWeights.js`. Eligibility remains deterministic and is applied before ranking, so the high semantic weight affects ordering among surviving candidates rather than deciding who qualifies.
