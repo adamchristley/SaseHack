@@ -1,0 +1,74 @@
+/* Steps */
+.steps { position: relative;}
+.steps::before{
+    content:"";
+    position: absolute; left:8px; right:8px; top: 65px;
+    height: 1px; background: #E4E0D6;
+}
+.steps-grid {
+    position: relative;
+    display: grid; 
+    grid-template-columns: repeat(3,1fr); gap: 48px;
+}
+.step .num {
+    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 58px; line-height: 1;
+    color: #1B6B4A; letter-spacing: -0.02em;
+}
+.step .dot {
+    width: 17px; height: 17px; border-radius: 999px;
+    background: #1B6B4A; border: 4px solid #FBFAF6;
+    margin-top: 17px;
+}
+.step h3 {font-size: 21px; margin-top: 24px; margin-bottom: 9px;}
+.step p {font-size: 15px; line-height: 1.62; color: #57544B; max-width: 340px;}
+
+/* Sources */
+.source-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    align-items: start;
+}
+.source-card {padding: 30px 28px 28px; border-radius: 14px; }
+.source-card:nth-child(2) {margin-top: 56px;}
+.source-card:nth-child(3) {margin-top: 24px;}
+.source-card .rule {width: 34px; height: 3px; border-radius: 2px; background: #1B6B4A;}
+.card-dark .rule {background: #3E9A72;}
+.source-card:nth-child(3) .rule {background-color: #B4511F;}
+.source-card .amount {
+    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 42px; line-height: 1;
+    letter-spacing: -0.02em; margin-top: 20px;
+}
+.source-card .amount small {font-size: 22px; color: #57544B;}
+
+/* Goal */
+.goal {border-top: 1px solid #E4E0D6; padding-top: 48px;}
+.goal h2 {
+    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-weight: 400;
+    font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15; letter-spacing: -0.02em;
+    max-width: 900px;
+}
+.goal-cols {display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 32px;}
+.goal-cols p {font-size: 16px; line-height: 1.65; color: #57544B;}
+
+/* Closing*/
+.closing {
+    background: #1B6B4A; color: #FBFAF6;
+    text-align: center; padding-block: 80px;
+}
+.closing h2 {
+    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-weight: 400;
+    font-size: clamp(32px, 4.2vw, 52px); line-height: 1; letter-spacing: -0.025em;
+    color: #FBFAF6;
+}
+.closing p {margin: 16px auto 32px; font-size: 17px; color: #C6E0D2; max-width: 520px }
+
+/* Footer*/
+.site-footer {
+    border-top: 1px solid #E4E0D6;
+    padding-block: 24px;
+    display: flex; align-items: center; flex-wrap: wrap; gap:16px;
+    font-size: 13px; color: #57544B;
+}
+.site-footer .mark {font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 19px; color: #191814;}
+.site-footer nav { display: flex; gap: 16px; margin-left: auto;}
+.site-footer nav a {color: #57544B;}
+.site-footer nav a:hover {color: #191814;}
