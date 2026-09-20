@@ -66,7 +66,10 @@ export default function Scholarships() {
     }
   }, [profile, hasProfile])
 
-  const matches = advanced?.matches || fallbackMatches
+  const fallbackConfirmed = fallbackMatches.filter((match) => match.eligibility?.status === 'eligible')
+  const fallbackNeedsInfo = fallbackMatches.filter((match) => match.eligibility?.status === 'needs_info')
+  const matches = advanced?.matches || fallbackConfirmed
+  const needsInfo = advanced?.needs_info || fallbackNeedsInfo
   const topFive = matches.slice(0, 5)
   const rest = matches.slice(5)
 
@@ -113,22 +116,25 @@ export default function Scholarships() {
               <p className="results-hint-title">Fill in your profile to see matches</p>
               <p>Or <button className="linkbtn" onClick={() => setProfile(SAMPLE_PROFILE)}>load the sample profile</button> to see it work instantly.</p>
             </div>
-          ) : matches.length === 0 ? (
+          ) : matches.length === 0 && needsInfo.length === 0 ? (
             <div className="empty">
               <p className="empty-title">No matches for this profile yet.</p>
               <p className="empty-body">
-                Every scholarship here stated a requirement your profile does not meet.
-                Try broadening a major or adjusting your year level, or add more rows to the dataset.
+                The current dataset does not contain a scholarship whose known requirements fit this profile.
               </p>
             </div>
           ) : (
             <>
-              <p className="result-label">Top {topFive.length} match{topFive.length === 1 ? '' : 'es'}</p>
-              <div className="card-grid">
-                {topFive.map((match, index) => (
-                  <ScholarshipCard key={match.scholarship.id} match={match} rank={index + 1} />
-                ))}
-              </div>
+              {topFive.length > 0 && (
+                <p className="result-label">Confirmed from known information · {topFive.length}</p>
+              )}
+              {topFive.length > 0 && (
+                <div className="card-grid">
+                  {topFive.map((match, index) => (
+                    <ScholarshipCard key={match.scholarship.id} match={match} rank={index + 1} />
+                  ))}
+                </div>
+              )}
 
               {rest.length > 0 && (
                 <details className="more">
@@ -141,6 +147,20 @@ export default function Scholarships() {
                 </details>
               )}
 
+              {needsInfo.length > 0 && (
+                <details className="more potential-matches">
+                  <summary>{needsInfo.length} potentially relevant scholarship{needsInfo.length === 1 ? '' : 's'} need more eligibility information</summary>
+                  <p className="potential-note">
+                    These are not confirmed matches. The resume does not provide one or more required facts, so we keep them separate instead of assuming eligibility.
+                  </p>
+                  <div className="card-grid">
+                    {needsInfo.map((match, index) => (
+                      <ScholarshipCard key={match.scholarship.id} match={match} rank={index + 1} />
+                    ))}
+                  </div>
+                </details>
+              )}
+
               {advanced?.meta && (
                 <details className="retrieval-meta">
                   <summary>Technical retrieval details</summary>
@@ -148,6 +168,11 @@ export default function Scholarships() {
                     <span>Lexical retrieval</span><strong>{advanced.meta.lexical_method}</strong>
                     <span>Rank fusion</span><strong>{advanced.meta.fusion_method}</strong>
                     <span>Semantic model</span><strong>{advanced.meta.semantic_model || 'local fallback'}</strong>
+                    {advanced.meta.semantic_error && (
+                      <>
+                        <span>Semantic fallback reason</span><strong>{advanced.meta.semantic_error}</strong>
+                      </>
+                    )}
                     <span>Rule weight</span><strong>{advanced.meta.weights.rules}</strong>
                     <span>Fusion weight</span><strong>{advanced.meta.weights.rrf}</strong>
                     <span>Semantic weight</span><strong>{advanced.meta.weights.semantic}</strong>
