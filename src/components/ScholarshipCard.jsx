@@ -4,20 +4,23 @@
 export default function ScholarshipCard({ match, rank }) {
   const { scholarship: s, score, reasons, retrieval, eligibility } = match
   const deadline = formatDeadline(s.deadline, s.recurring)
+  const unresolved = eligibility?.status === 'needs_info'
 
   return (
     <article className="card sch-card">
       <div className="card-head">
         <div>
-          <span className="rank">#{rank}</span>
+          {!unresolved && rank != null && <span className="rank">#{rank}</span>}
           <h3 className="card-title">{s.name}</h3>
           {s.sponsor && <p className="sch-sponsor">{s.sponsor}</p>}
         </div>
         <div className="sch-amount">
           <span className="savings-num">{formatAmount(s)}</span>
-          <span className="score" title={retrieval ? 'Hybrid retrieval score' : 'Deterministic match score'}>
-            score {score}
-          </span>
+          {!unresolved && (
+            <span className="score" title={retrieval ? 'Hybrid retrieval score' : 'Deterministic match score'}>
+              score {score}
+            </span>
+          )}
         </div>
       </div>
 
@@ -42,7 +45,7 @@ export default function ScholarshipCard({ match, rank }) {
 
       {retrieval && (
         <details className="retrieval-details">
-          <summary>Why it ranked here</summary>
+          <summary>{unresolved ? 'Why we retrieved this' : 'Why it ranked here'}</summary>
           <div className="retrieval-metrics">
             <Metric label="Eligibility rules" value={retrieval.rule_score} />
             <Metric label="BM25" value={retrieval.lexical_score} />
