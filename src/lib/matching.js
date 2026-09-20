@@ -35,42 +35,72 @@ function daysUntil(dateStr, today = new Date()) {
   return Math.round(ms / 86400000)
 }
 
-// ---- pass 1: hard filters ------------------------------------------------
+// ---- pass 1: eligibility assessment -------------------------------------
 
 /**
- * Returns true if the student is ELIGIBLE (row survives).
- * A missing profile field can't fail a requirement (we don't know), so we
- * only exclude when both the requirement AND the relevant profile fact exist.
+ * Eligibility is tri-state:
+ *   eligible    all known requirements are satisfied
+ *   needs_info  no conflict, but the profile is missing required information
+ *   ineligible  at least one explicit requirement conflicts
+ *
+ * Missing demographic / affiliation information must never be treated as a
+ * positive match. This prevents scholarships for women, disability, veteran,
+ * ethnicity, etc. from being presented as confirmed matches when the resume
+ * says nothing about those criteria.
  */
-export function isEligible(scholarship, profile, today = new Date()) {
+export function assessEligibility(scholarship, profile, today = new Date()) {
   const s = scholarship
   const p = profile || {}
+  const unknown = []
+  const conflicts = []
 
-  // Scam rule: legitimate awards never charge an application fee.
-  if (s.requires_fee === true) return false
+  if (s.requires_fee === true) conflicts.push('application fee')
 
-  // Major: excluded only if the row restricts majors and none overlap.
-  if (list(s.majors).length && overlap(s.majors, p.majors).length === 0) return false
+  if (list(s.majors).length) {
+    if (!list(p.majors).length) unknown.push('major')
+    else if (overlap(s.majors, p.majors).length === 0) conflicts.push('major')
+  }
 
-  // GPA: excluded if a minimum is set and the (known) GPA is below it.
-  if (s.min_gpa != null && p.gpa != null && Number(p.gpa) < Number(s.min_gpa)) return false
+  if (s.min_gpa != null) {
+    if (p.gpa == null) unknown.push('GPA')
+    else if (Number(p.gpa) < Number(s.min_gpa)) conflicts.push('GPA')
+  }
 
-  // Year level: excluded if restricted and the (known) year isn't included.
-  if (list(s.year_levels).length && p.year_level &&
-      !list(s.year_levels).map(norm).includes(norm(p.year_level))) return false
+  if (list(s.year_levels).length) {
+    if (!p.year_level) unknown.push('year level')
+    else if (!list(s.year_levels).map(norm).includes(norm(p.year_level))) conflicts.push('year level')
+  }
 
-  // State: excluded if restricted and the (known) state isn't included.
-  if (list(s.states).length && p.state &&
-      !list(s.states).map(norm).includes(norm(p.state))) return false
+  if (list(s.states).length) {
+    if (!p.state) unknown.push('residency state')
+    else if (!list(s.states).map(norm).includes(norm(p.state))) conflicts.push('residency state')
+  }
 
-  // Citizenship: excluded only on a stated mismatch.
-  if (s.citizenship && p.citizenship && norm(s.citizenship) !== norm(p.citizenship)) return false
+  if (s.citizenship) {
+    if (!p.citizenship) unknown.push('citizenship')
+    else if (norm(s.citizenship) !== norm(p.citizenship)) conflicts.push('citizenship')
+  }
 
-  // Deadline: a past, non-recurring deadline is dead.
+  if (list(s.affiliations).length && overlap(s.affiliations, p.affiliations).length === 0) {
+    unknown.push('eligibility group / affiliation')
+  }
+
   const d = daysUntil(s.deadline, today)
-  if (d != null && d < 0 && !s.recurring) return false
+  if (d != null && d < 0 && !s.recurring) conflicts.push('deadline passed')
 
-  return true
+  return {
+    status: conflicts.length ? 'ineligible' : unknown.length ? 'needs_info' : 'eligible',
+    unknown: [...new Set(unknown)],
+    conflicts: [...new Set(conflicts)],
+  }
+}
+
+/**
+ * Backward-compatible boolean used by existing tests and callers. A scholarship
+ * survives unless a known fact proves the student ineligible.
+ */
+export function isEligible(scholarship, profile, today = new Date()) {
+  return assessEligibility(scholarship, profile, today).status !== 'ineligible'
 }
 
 // ---- pass 2: scoring + reasons ------------------------------------------
@@ -154,9 +184,14 @@ export function matchScholarships(scholarships, profile, { limit = 20, today = n
     .filter((s) => isEligible(s, profile, today))
     .map((s) => {
       const { score, reasons } = scoreMatch(s, profile, today)
-      return { scholarship: s, score, reasons }
+      const eligibility = assessEligibility(s, profile, today)
+      return { scholarship: s, score, reasons, eligibility }
     })
-    .sort((a, b) => b.score - a.score || deadlineTie(a, b))
+    .sort((a, b) => {
+      const statusRank = { eligible: 0, needs_info: 1, ineligible: 2 }
+      const byStatus = statusRank[a.eligibility.status] - statusRank[b.eligibility.status]
+      return byStatus || b.score - a.score || deadlineTie(a, b)
+    })
     .slice(0, limit)
 }
 
