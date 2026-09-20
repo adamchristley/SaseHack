@@ -234,7 +234,7 @@ function titleCase(s) { return String(s).replace(/\b\w/g, (c) => c.toUpperCase()
 
 function citizenshipMatches(requirement, value) {
   const actual = norm(value)
-  if (requirement === 'US_CITIZEN') return actual === 'us_citizen'
+  if (requirement === 'US_CITIZEN' || requirement === 'US') return actual === 'us_citizen'
   if (requirement === 'US_OR_PR') {
     return ['us_citizen', 'us_national', 'permanent_resident'].includes(actual)
   }
@@ -242,7 +242,7 @@ function citizenshipMatches(requirement, value) {
 }
 
 function citizenshipLabel(requirement) {
-  if (requirement === 'US_CITIZEN') return 'U.S. citizenship'
+  if (requirement === 'US_CITIZEN' || requirement === 'US') return 'U.S. citizenship'
   if (requirement === 'US_OR_PR') return 'U.S. citizen/national/permanent resident'
   return 'citizenship'
 }
