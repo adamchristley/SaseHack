@@ -60,11 +60,10 @@ function LoginStub() {
     <section className="wrap narrow">
       <h1 className="h1">Log in</h1>
       <p className="lead">
-        Optional. Both tools work fully without an account — login just saves your
-        finds for later. This tab is owned by the auth teammate.
+        To be made and connected
       </p>
       <div className="panel muted-panel">
-        <p>Nothing is ever gated behind login. This is a placeholder for the auth teammate's email capture.</p>
+        <p>Nothing here yet.</p>
       </div>
     </section>
   )
