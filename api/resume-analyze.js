@@ -1,4 +1,5 @@
-import { GoogleGenAI, Type } from '@google/genai'
+import { Type } from '@google/genai'
+import { createGenAI, friendlyGeminiError, withGeminiRetry } from './genai-client.js'
 
 const MODEL = 'gemini-3.1-flash-lite'
 const MAX_TEXT_CHARS = 30000
@@ -71,7 +72,7 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Resume text is too long for the demo endpoint.' })
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+  const ai = createGenAI(process.env.GEMINI_API_KEY)
 
   const prompt = `
 Extract a scholarship-search profile from the resume below.
@@ -100,7 +101,7 @@ ${text}
 `.trim()
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await withGeminiRetry(() => ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: {
@@ -109,14 +110,14 @@ ${text}
         responseMimeType: 'application/json',
         responseSchema,
       },
-    })
+    }))
 
     const analysis = JSON.parse(response.text)
     return res.status(200).json({ model: MODEL, analysis })
   } catch (error) {
     console.error('Resume analysis endpoint error', error)
     return res.status(502).json({
-      error: error instanceof Error ? error.message : 'Gemini resume extraction failed.',
+      error: friendlyGeminiError(error),
       code: 'GEMINI_UPSTREAM_ERROR',
     })
   }
