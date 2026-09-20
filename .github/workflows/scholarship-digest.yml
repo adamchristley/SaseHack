@@ -1,16 +1,5 @@
 name: Scholarship Digest
 
-# HOW OFTEN THIS CAN RUN
-# GitHub Actions cannot schedule anything more often than every 5 minutes, and scheduled
-# runs are best-effort: they are often delayed by 5-30+ minutes and sometimes skipped.
-# "Every minute" is not possible with `schedule`. Two ways to get close:
-#   * Manual test: Actions tab > Scholarship Digest > Run workflow (instant, any time).
-#   * Demo mode (below): each scheduled run stays alive ~5 minutes and sends once a minute.
-#
-# TEST MODE is ON (see `env` below). It emails EVERY opted-in user once a minute, so put
-# YOUR OWN address in ONLY_EMAIL first. When you are done testing, switch to the PRODUCTION
-# values and change the cron to weekly.
-
 on:
   schedule:
     - cron: '*/5 * * * *'      # PRODUCTION: '0 14 * * 1'  (Mondays 14:00 UTC = 10:00 Eastern in summer)
@@ -45,7 +34,7 @@ env:
   # TEST MODE (current)                 # PRODUCTION
   MIN_MINUTES_BETWEEN: '1'              # '10080'   (one week)
   PASSES_PER_RUN: '5'                   # '1'
-  ONLY_EMAIL: ''                        # ''        <- put YOUR address here while testing
+  ONLY_EMAIL: 'mwood8603@gmail.com'                        # ''        <- put YOUR address here while testing
 
 jobs:
   send-digest:
