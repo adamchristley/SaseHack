@@ -9,7 +9,7 @@
  */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isEligible, matchScholarships, overlap } from '../src/lib/matching.js'
+import { assessEligibility, isEligible, matchScholarships, overlap } from '../src/lib/matching.js'
 
 const base = {
   id: 0, name: 'X', source_url: 'https://example.edu', requires_fee: false,
@@ -95,4 +95,29 @@ test('deadline urgency adds score and a reason', () => {
   const s = S({ id: 4, deadline: iso, recurring: false })
   const [m] = matchScholarships([s], csJunior)
   assert.ok(m.reasons.some((r) => /deadline/i.test(r)))
+})
+
+
+test('missing demographic or affiliation requirement is needs_info, not confirmed eligible', () => {
+  const womenOnly = S({ affiliations: ['women in engineering'] })
+  const assessment = assessEligibility(womenOnly, {
+    ...csJunior,
+    affiliations: [],
+  })
+
+  assert.equal(assessment.status, 'needs_info')
+  assert.ok(assessment.unknown.includes('eligibility group / affiliation'))
+})
+
+test('missing GPA requirement is needs_info while known low GPA is ineligible', () => {
+  const gated = S({ min_gpa: 3.5 })
+
+  assert.equal(
+    assessEligibility(gated, { ...csJunior, gpa: null }).status,
+    'needs_info',
+  )
+  assert.equal(
+    assessEligibility(gated, { ...csJunior, gpa: 3.2 }).status,
+    'ineligible',
+  )
 })
