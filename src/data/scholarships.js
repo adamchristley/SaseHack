@@ -43,7 +43,7 @@ const s = (row) => ({
 })
 
 // Reusable major groupings so eligibility stays consistent across rows.
-const STEM = ['computer science', 'electrical engineering', 'mechanical engineering', 'chemical engineering', 'civil engineering', 'biology', 'chemistry', 'physics', 'mathematics', 'data science']
+const STEM = ['computer science', 'computer engineering', 'software engineering', 'electrical engineering', 'mechanical engineering', 'chemical engineering', 'civil engineering', 'biomedical engineering', 'industrial engineering', 'aerospace engineering', 'biology', 'chemistry', 'physics', 'mathematics', 'statistics', 'data science']
 const CS = ['computer science', 'software engineering', 'computer engineering', 'data science']
 const ENG = ['electrical engineering', 'mechanical engineering', 'civil engineering', 'chemical engineering', 'aerospace engineering', 'software engineering', 'computer engineering', 'industrial engineering']
 
