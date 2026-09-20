@@ -1,0 +1,27 @@
+name: Scholarship Digest
+
+on:
+  schedule:
+    # TESTING: every 5 minutes (GitHub Actions' practical minimum interval —
+    # true "every 1 minute" isn't supported on the free tier).
+    # For production, change to something like '0 9 * * 1' (9am every Monday).
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {} # lets you manually trigger a run from GitHub's UI, any time
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: digest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: node send-digest.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
