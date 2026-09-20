@@ -20,7 +20,7 @@ export const rankingBenchmark = [
       interests: ['machine learning', 'systems programming'],
       work_experience: ['software engineering intern'],
     },
-    relevance: { 1: 3, 3: 3, 18: 1 },
+    relevance: { 1: 3, 3: 3 },
   },
   {
     name: 'manufacturing-focused mechanical engineer',
