@@ -27,12 +27,13 @@ export default function ResumeUpload({ onProfile }) {
       try {
         setStatus('analyzing')
         result = await analyzeResumeWithAI(text)
-      } catch {
+      } catch (aiError) {
         result = {
           ...local,
           diagnostics: {
             ...local.diagnostics,
             source: 'local-fallback',
+            ai_error: aiError instanceof Error ? aiError.message : 'AI extraction failed.',
           },
         }
       }
@@ -94,8 +95,14 @@ export default function ResumeUpload({ onProfile }) {
           {diagnostics.rejected_claims?.length > 0 && (
             <span>{diagnostics.rejected_claims.length} unsupported AI claim(s) were rejected.</span>
           )}
+          {diagnostics.derived_fields?.length > 0 && (
+            <span>Estimated from resume: {diagnostics.derived_fields.join(', ')}. Please confirm.</span>
+          )}
           {diagnostics.missing_fields.length > 0 && (
             <span>Still check: {diagnostics.missing_fields.join(', ')}.</span>
+          )}
+          {diagnostics.ai_error && (
+            <span className="resume-ai-error">Gemini fallback reason: {diagnostics.ai_error}</span>
           )}
         </div>
       )}
