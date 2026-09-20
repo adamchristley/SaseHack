@@ -30,19 +30,29 @@ if (!process.env.GEMINI_API_KEY) {
 const ai = createGenAI(process.env.GEMINI_API_KEY)
 const cases = []
 
-for (const item of benchmark) {
-  console.log(`Embedding benchmark case: ${item.name}`)
-  try {
-    cases.push({
-      ...item,
-      signals: await buildSignals(item.profile),
-    })
-  } catch (error) {
-    console.error('\nCould not reach Gemini while building the ranking benchmark.')
-    console.error(friendlyGeminiError(error))
-    console.error('The optimizer needs semantic embeddings, so no weights were changed. Retry when Gemini is reachable.')
-    process.exit(1)
-  }
+let scholarshipVectors
+let queryVectors
+
+try {
+  console.log(`Embedding scholarship corpus once (${scholarships.length} scholarships)...`)
+  scholarshipVectors = await embedTexts(scholarships.map(scholarshipSearchText))
+
+  console.log(`Embedding benchmark profiles once (${benchmark.length} profiles)...`)
+  queryVectors = await embedTexts(benchmark.map((item) => buildProfileQuery(item.profile)))
+} catch (error) {
+  console.error('\nCould not build semantic embeddings for the ranking benchmark.')
+  console.error(friendlyGeminiError(error))
+  console.error('The optimizer needs semantic embeddings, so no weights were changed.')
+  process.exit(1)
+}
+
+for (let index = 0; index < benchmark.length; index += 1) {
+  const item = benchmark[index]
+  console.log(`Preparing benchmark case: ${item.name}`)
+  cases.push({
+    ...item,
+    signals: buildSignals(item.profile, queryVectors[index], scholarshipVectors),
+  })
 }
 
 const initial = [
@@ -105,10 +115,10 @@ console.log(`rrf:      ${best[1].toFixed(4)}`)
 console.log(`semantic: ${best[2].toFixed(4)}`)
 console.log('\nPaste these into src/data/rankingWeights.js after reviewing the benchmark.')
 
-async function buildSignals(profile) {
+function buildSignals(profile, queryVector, documentVectors) {
   const eligible = scholarships.filter((s) => assessEligibility(s, profile).status === 'eligible')
   const lexical = bm25Rank(scholarships, profile)
-  const semantic = await semanticRank(profile)
+  const semantic = semanticRank(queryVector, documentVectors)
 
   const lexRanks = rankMap(lexical)
   const semRanks = rankMap(semantic)
@@ -143,15 +153,17 @@ async function buildSignals(profile) {
   }))
 }
 
-async function semanticRank(profile) {
-  const query = buildProfileQuery(profile)
-  const docs = scholarships.map(scholarshipSearchText)
+function semanticRank(queryVector, documentVectors) {
+  return scholarships.map((scholarship, index) => ({
+    id: String(scholarship.id),
+    score: cosine(queryVector, documentVectors[index] || []),
+  })).sort((a, b) => b.score - a.score)
+}
+
+async function embedTexts(texts) {
   const result = await withGeminiRetry(() => ai.models.embedContent({
     model: MODEL,
-    contents: [
-      { parts: [{ text: query }] },
-      ...docs.map((text) => ({ parts: [{ text }] })),
-    ],
+    contents: texts.map((text) => ({ parts: [{ text }] })),
     config: {
       taskType: 'SEMANTIC_SIMILARITY',
       outputDimensionality: 128,
@@ -159,12 +171,11 @@ async function semanticRank(profile) {
   }))
 
   const embeddings = result.embeddings || []
-  const queryVector = embeddings[0]?.values || []
+  if (embeddings.length !== texts.length) {
+    throw new Error(`Unexpected embedding response size: expected ${texts.length}, received ${embeddings.length}.`)
+  }
 
-  return scholarships.map((scholarship, index) => ({
-    id: String(scholarship.id),
-    score: cosine(queryVector, embeddings[index + 1]?.values || []),
-  })).sort((a, b) => b.score - a.score)
+  return embeddings.map((embedding) => embedding?.values || [])
 }
 
 function objective(weights) {
