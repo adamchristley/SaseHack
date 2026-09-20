@@ -1,16 +1,56 @@
 name: Scholarship Digest
 
+# HOW OFTEN THIS CAN RUN
+# GitHub Actions cannot schedule anything more often than every 5 minutes, and scheduled
+# runs are best-effort: they are often delayed by 5-30+ minutes and sometimes skipped.
+# "Every minute" is not possible with `schedule`. Two ways to get close:
+#   * Manual test: Actions tab > Scholarship Digest > Run workflow (instant, any time).
+#   * Demo mode (below): each scheduled run stays alive ~5 minutes and sends once a minute.
+#
+# TEST MODE is ON (see `env` below). It emails EVERY opted-in user once a minute, so put
+# YOUR OWN address in ONLY_EMAIL first. When you are done testing, switch to the PRODUCTION
+# values and change the cron to weekly.
+
 on:
   schedule:
-    # TESTING: every 5 minutes (GitHub Actions' practical minimum interval —
-    # true "every 1 minute" isn't supported on the free tier).
-    # For production, change to something like '0 9 * * 1' (9am every Monday).
-    - cron: '*/5 * * * *'
-  workflow_dispatch: {} # lets you manually trigger a run from GitHub's UI, any time
+    - cron: '*/5 * * * *'      # PRODUCTION: '0 14 * * 1'  (Mondays 14:00 UTC = 10:00 Eastern in summer)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Show who would be emailed, but send nothing'
+        type: boolean
+        default: false
+      only_email:
+        description: 'Only email this address (blank = use the value in the workflow file)'
+        type: string
+        required: false
+      min_minutes:
+        description: 'Skip people emailed in the last N minutes (0 = always send; blank = workflow default)'
+        type: string
+        required: false
+      passes:
+        description: 'How many times to run, one minute apart (blank = workflow default)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+# Never let two digest runs overlap; the next one waits its turn.
+concurrency:
+  group: scholarship-digest
+  cancel-in-progress: false
+
+env:
+  # TEST MODE (current)                 # PRODUCTION
+  MIN_MINUTES_BETWEEN: '1'              # '10080'   (one week)
+  PASSES_PER_RUN: '5'                   # '1'
+  ONLY_EMAIL: ''                        # ''        <- put YOUR address here while testing
 
 jobs:
   send-digest:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     defaults:
       run:
         working-directory: digest
@@ -20,8 +60,22 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: node send-digest.js
+
+      - name: Send digests
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SITE_URL: https://login-sasehack.web.app
+          MIN_MINUTES_BETWEEN: ${{ inputs.min_minutes || env.MIN_MINUTES_BETWEEN }}
+          ONLY_EMAIL: ${{ inputs.only_email || env.ONLY_EMAIL }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          PASSES: ${{ inputs.passes || env.PASSES_PER_RUN }}
+        run: |
+          failed=0
+          for i in $(seq 1 "$PASSES"); do
+            echo "=== pass $i of $PASSES ==="
+            node send-digest.js || failed=1
+            if [ "$i" -lt "$PASSES" ]; then sleep 60; fi
+          done
+          exit $failed
