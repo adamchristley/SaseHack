@@ -160,7 +160,7 @@ export function analyzeResumeText(rawText) {
   const lines = text.split('\n').map((line) => line.trim()).filter(Boolean)
 
   const profile = {
-    majors: findPhrases(textLower, MAJORS),
+    majors: findMajors(lines),
     year_level: findYearLevel(textLower) || inferYearLevelFromGraduation(text),
     gpa: findGpa(text),
     state: findState(lines),
@@ -196,8 +196,43 @@ function findPhrases(textLower, dictionary) {
 }
 
 function containsTerm(textLower, term) {
+  const escaped = term.toLowerCase().replace(/[.*+?^$(){}|[\]\\]/g, '\\function containsTerm(textLower, term) {
   const escaped = term.toLowerCase().replace(/[.*+?^$(){}|[\]\\]/g, '\\$&')
   return new RegExp(`(^|[^a-z0-9+#.])${escaped}([^a-z0-9+#.]|$)`, 'i').test(textLower)
+}')
+  // Punctuation such as a trailing period should count as a word boundary.
+  // Dots that belong inside a term (for example next.js) are already part of
+  // the escaped literal and still match correctly.
+  return new RegExp(`(^|[^a-z0-9+#])${escaped}([^a-z0-9+#]|$)`, 'i').test(textLower)
+}
+
+function findMajors(lines) {
+  const candidates = []
+  let inEducation = false
+
+  for (const line of lines) {
+    if (/^education\b/i.test(line)) {
+      inEducation = true
+      continue
+    }
+
+    if (
+      inEducation &&
+      /^(experience|projects?|skills?|activities|leadership|research|awards?|certifications?)\b/i.test(line)
+    ) {
+      inEducation = false
+    }
+
+    if (
+      inEducation ||
+      /\b(b\.?s\.?|bachelor|m\.?s\.?|master|ph\.?d\.?|major(?:ing)?|degree|student)\b/i.test(line)
+    ) {
+      candidates.push(line)
+    }
+  }
+
+  const candidateText = candidates.join(' ').toLowerCase()
+  return findPhrases(candidateText, MAJORS)
 }
 
 function findGpa(text) {
