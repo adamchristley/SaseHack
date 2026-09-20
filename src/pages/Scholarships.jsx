@@ -46,12 +46,15 @@ export default function Scholarships() {
       </div>
 
       <div className="sch-layout">
-        <ProfilePanel
-          profile={profile}
-          onChange={setProfile}
-          onLoadSample={() => setProfile(SAMPLE_PROFILE)}
-          onClear={() => setProfile(EMPTY_PROFILE)}
-        />
+        <div className="sch-sidebar">
+          <ResumeUpload onProfile={setProfile} />
+          <ProfilePanel
+            profile={profile}
+            onChange={setProfile}
+            onLoadSample={() => setProfile(SAMPLE_PROFILE)}
+            onClear={() => setProfile(EMPTY_PROFILE)}
+          />
+        </div>
 
         <div className="sch-results">
           {!hasProfile ? (
