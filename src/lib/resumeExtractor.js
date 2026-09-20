@@ -196,13 +196,9 @@ function findPhrases(textLower, dictionary) {
 }
 
 function containsTerm(textLower, term) {
-  const escaped = term.toLowerCase().replace(/[.*+?^$(){}|[\]\\]/g, '\\function containsTerm(textLower, term) {
   const escaped = term.toLowerCase().replace(/[.*+?^$(){}|[\]\\]/g, '\\$&')
-  return new RegExp(`(^|[^a-z0-9+#.])${escaped}([^a-z0-9+#.]|$)`, 'i').test(textLower)
-}')
-  // Punctuation such as a trailing period should count as a word boundary.
-  // Dots that belong inside a term (for example next.js) are already part of
-  // the escaped literal and still match correctly.
+  // Treat punctuation as a boundary while still allowing punctuation inside
+  // terms such as next.js, c++, and c#.
   return new RegExp(`(^|[^a-z0-9+#])${escaped}([^a-z0-9+#]|$)`, 'i').test(textLower)
 }
 
