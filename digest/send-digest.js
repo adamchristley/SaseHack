@@ -1,111 +1,129 @@
 /*
- * Scheduled "best scholarship matches" email digest — run by GitHub Actions
- * instead of Firebase Cloud Functions, so it never needs Blaze billing.
+ * Scholarship digest email, run by GitHub Actions (.github/workflows/scholarship-digest.yml).
  *
- * Connects to your same Firestore database from outside Google Cloud using
- * a service account key. Firestore doesn't care where the request comes
- * from; only running code INSIDE Google Cloud (Cloud Functions) needs
- * Blaze — reading/writing Firestore itself does not.
+ * For every user with emailOptIn == true and a saved profile, it emails their best
+ * scholarship matches, but only if they haven't been emailed within MIN_MINUTES_BETWEEN
+ * minutes (tracked in users/{uid}.lastDigestAt). That is what lets the workflow run often
+ * without spamming anyone: the schedule decides when we LOOK, this decides who is DUE.
  *
- * SETUP:
- *   1. Firebase Console -> Project Settings (gear icon) -> Service Accounts
- *      -> "Generate new private key" -> downloads a JSON file.
- *   2. In your GitHub repo: Settings -> Secrets and variables -> Actions ->
- *      New repository secret. Name: FIREBASE_SERVICE_ACCOUNT
- *      Value: paste the ENTIRE contents of that downloaded JSON file.
- *   3. Add two more secrets the same way:
- *      GMAIL_USER          (your Gmail address that sends the digest)
- *      GMAIL_APP_PASSWORD  (the 16-character app password, not your real password)
- *   4. Copy your actual src/lib/matching.js and src/data/scholarships.js
- *      into this same digest/ folder, exactly as-is, no changes needed.
+ * Settings (environment variables):
+ *   FIREBASE_SERVICE_ACCOUNT   the whole service-account JSON (GitHub secret)
+ *   GMAIL_USER                 Gmail address that sends the mail (GitHub secret)
+ *   GMAIL_APP_PASSWORD         16-character Gmail app password (GitHub secret)
+ *   SITE_URL                   your site, used for the link in the email
+ *   MIN_MINUTES_BETWEEN        default 10080 (one week). 0 = always send. 1 = at most once a minute.
+ *   ONLY_EMAIL                 testing: only email this address, skip everyone else
+ *   DRY_RUN                    "true" = print who would be emailed, send nothing
+ *
+ * Running it on your own computer:
+ *   set FIREBASE_SERVICE_ACCOUNT_FILE=C:\path\to\key.json   (instead of FIREBASE_SERVICE_ACCOUNT)
+ *   set GMAIL_USER=...   set GMAIL_APP_PASSWORD=...   set DRY_RUN=true
+ *   node send-digest.js
  */
 import admin from 'firebase-admin'
 import nodemailer from 'nodemailer'
-import { matchScholarships } from './matching.js'
+import { readFileSync } from 'node:fs'
 import scholarships from './scholarships.js'
+import { isDue, pickMatches, buildEmail } from './digest-lib.js'
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+const DRY_RUN = process.env.DRY_RUN === 'true'
+const MIN_MINUTES = process.env.MIN_MINUTES_BETWEEN === undefined || process.env.MIN_MINUTES_BETWEEN === ''
+  ? 10080
+  : Number(process.env.MIN_MINUTES_BETWEEN)
+const ONLY_EMAIL = (process.env.ONLY_EMAIL || '').trim().toLowerCase()
+const SITE_URL = process.env.SITE_URL || 'https://login-sasehack.web.app'
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-})
-
-const db = admin.firestore()
-
-function buildEmail(matches) {
-  const lines = matches.map((m, i) =>
-    `${i + 1}. ${m.scholarship.name} — ${m.scholarship.amount_display || ''}\n` +
-    `   ${m.reasons.join('; ')}\n` +
-    `   ${m.scholarship.source_url}`
-  )
-  const text =
-    `Here are your best-matching scholarships this week:\n\n${lines.join('\n\n')}\n\n` +
-    `You're getting this because you opted in on Charge Up Savings. ` +
-    `Turn it off any time in your Account tab.`
-  const html =
-    `<p>Here are your best-matching scholarships this week:</p><ol>` +
-    matches.map((m) =>
-      `<li><strong>${m.scholarship.name}</strong> — ${m.scholarship.amount_display || ''}<br>` +
-      `${m.reasons.join('; ')}<br>` +
-      `<a href="${m.scholarship.source_url}">${m.scholarship.source_url}</a></li>`
-    ).join('') +
-    `</ol><p style="color:#888;font-size:13px">You're getting this because you opted in on ` +
-    `Charge Up Savings. Turn it off any time in your Account tab.</p>`
-  return { text, html }
+function fail(message) {
+  console.error(`ERROR: ${message}`)
+  process.exit(1)
 }
 
-async function main() {
-  const transporter = nodemailer.createTransport({
+function need(name, where = 'Settings > Secrets and variables > Actions') {
+  const value = process.env[name]
+  if (!value) fail(`${name} is not set. Add it under ${where}.`)
+  return value
+}
+
+if (!Number.isFinite(MIN_MINUTES) || MIN_MINUTES < 0) fail('MIN_MINUTES_BETWEEN must be a number of minutes (0 or more).')
+
+// ---- Firebase ------------------------------------------------------------
+let serviceAccount
+try {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_FILE
+    ? readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_FILE, 'utf8')
+    : need('FIREBASE_SERVICE_ACCOUNT')
+  serviceAccount = JSON.parse(raw)
+} catch (err) {
+  fail(`Could not read the Firebase key (${err.message}). Paste the ENTIRE contents of the downloaded .json file into the FIREBASE_SERVICE_ACCOUNT secret.`)
+}
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
+const db = admin.firestore()
+
+// ---- Gmail ---------------------------------------------------------------
+let transporter = null
+if (!DRY_RUN) {
+  transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+    auth: { user: need('GMAIL_USER'), pass: need('GMAIL_APP_PASSWORD') },
   })
-
-  const optedInSnap = await db.collection('users').where('emailOptIn', '==', true).get()
-  console.log(`Found ${optedInSnap.size} opted-in user(s).`)
-
-  for (const docSnap of optedInSnap.docs) {
-    const uid = docSnap.id
-    const data = docSnap.data()
-    const profile = data.profile
-
-    if (!profile) {
-      console.log(`Skipping ${uid} — no saved profile yet.`)
-      continue
-    }
-
-    const matches = matchScholarships(scholarships, profile, { limit: 5 })
-    if (matches.length === 0) {
-      console.log(`Skipping ${uid} — no matches for current profile.`)
-      continue
-    }
-
-    let email
-    try {
-      const userRecord = await admin.auth().getUser(uid)
-      email = userRecord.email
-    } catch (err) {
-      console.error(`Could not look up auth email for ${uid}:`, err.message)
-      continue
-    }
-    if (!email) continue
-
-    const { text, html } = buildEmail(matches)
-    try {
-      await transporter.sendMail({
-        from: `Charge Up Savings <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: `Your ${matches.length} best scholarship matches this week`,
-        text,
-        html,
-      })
-      console.log(`Sent digest to ${email}`)
-    } catch (err) {
-      console.error(`Failed to send to ${email}:`, err.message)
-    }
+  try {
+    await transporter.verify() // fails fast with a clear reason if the login is wrong
+  } catch (err) {
+    fail(`Gmail login failed: ${err.message}. Check GMAIL_USER and that GMAIL_APP_PASSWORD is a Gmail APP password (needs 2-Step Verification), not your normal password.`)
   }
 }
 
-main().catch((err) => {
-  console.error('Digest run failed:', err)
-  process.exit(1)
-})
+// ---- main ----------------------------------------------------------------
+const mode = [DRY_RUN && 'DRY RUN', ONLY_EMAIL && 'test address only', `min ${MIN_MINUTES} min between emails`].filter(Boolean).join(', ')
+console.log(`Digest run started (${mode}).`)
+
+const snap = await db.collection('users').where('emailOptIn', '==', true).get()
+console.log(`Found ${snap.size} opted-in user(s).`)
+
+let sent = 0
+let skipped = 0
+let failed = 0
+
+for (const docSnap of snap.docs) {
+  // If this repo is public the Actions log is public too, so log a short id, never an address.
+  const label = docSnap.id.slice(0, 6) + '…'
+  try {
+    const data = docSnap.data()
+
+    if (!data.profile) { skipped++; console.log(`${label}: skipped (no saved profile yet)`); continue }
+    if (!isDue(data.lastDigestAt, Date.now(), MIN_MINUTES)) { skipped++; console.log(`${label}: skipped (emailed recently)`); continue }
+
+    const account = await admin.auth().getUser(docSnap.id)
+    if (!account.email || !account.emailVerified) { skipped++; console.log(`${label}: skipped (email not verified)`); continue }
+    if (ONLY_EMAIL && account.email.toLowerCase() !== ONLY_EMAIL) { skipped++; console.log(`${label}: skipped (not the test address)`); continue }
+
+    const matches = pickMatches(scholarships, data.profile)
+    if (matches.length === 0) { skipped++; console.log(`${label}: skipped (no confirmed matches for this profile)`); continue }
+
+    const { subject, text, html } = buildEmail({ name: account.displayName, matches, siteUrl: SITE_URL })
+
+    if (DRY_RUN) {
+      console.log(`${label}: would send "${subject}"`)
+      matches.forEach((m) => console.log(`    - ${m.scholarship.name}`))
+    } else {
+      await transporter.sendMail({
+        from: `Charge Up Savings <${process.env.GMAIL_USER}>`,
+        to: account.email,
+        subject,
+        text,
+        html,
+      })
+      // Only after a successful send, so a failure is retried on the next run.
+      await docSnap.ref.update({ lastDigestAt: admin.firestore.FieldValue.serverTimestamp() })
+      console.log(`${label}: sent ${matches.length} match(es)`)
+    }
+    sent++
+  } catch (err) {
+    failed++
+    console.error(`${label}: FAILED - ${err.message}`)
+  }
+}
+
+console.log(`Done. ${DRY_RUN ? 'would send' : 'sent'}: ${sent}, skipped: ${skipped}, failed: ${failed}`)
+// A red X in the Actions tab is much easier to notice than a green check with errors buried in the log.
+if (failed > 0) process.exitCode = 1
