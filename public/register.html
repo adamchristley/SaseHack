@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Registration Form</title>
+</head>
+<body>
+    <div class="container">
+        <div id="message"></div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <input type="text" id="fullname" class="form-control" placeholder="Full name:" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email:" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="Password:" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="repeat" class="form-control" placeholder="Repeat Password:" required>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Register">
+            </div>
+        </form>
+        <div><p>Already registered? <a href="login.html">Login</a></p></div>
+    </div>
+
+    <script type="module" src="register.js"></script>
+</body>
+</html>
