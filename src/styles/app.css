@@ -259,3 +259,56 @@ button { font-family: inherit; cursor: pointer; }
 .resume-result span { color: var(--text-dim); }
 .resume-error { color: var(--bad); font-size: 13px; margin: 10px 0 0; }
 .resume-privacy { color: var(--text-faint); font-size: 12px; margin: 12px 0 0; }
+
+
+/* ---- advanced retrieval ------------------------------------------------- */
+.ranking-status {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 14px; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text-dim);
+  font-size: 12px; font-weight: 700;
+}
+.ranking-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.ranking-dot--live { background: var(--good); box-shadow: 0 0 0 4px rgba(86, 211, 100, 0.08); }
+.ranking-dot--local { background: var(--mtu-gold); }
+
+.retrieval-details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.015);
+}
+.retrieval-details summary {
+  cursor: pointer; padding: 9px 11px; color: var(--text-dim);
+  font-size: 12px; font-weight: 700;
+}
+.retrieval-metrics {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; padding: 0 11px 11px;
+}
+.retrieval-metrics div {
+  display: flex; justify-content: space-between; gap: 8px;
+  padding: 7px 8px; border-radius: 6px; background: var(--bg);
+}
+.retrieval-metrics span { color: var(--text-faint); font-size: 11px; }
+.retrieval-metrics strong { color: var(--text); font-size: 11px; }
+
+.retrieval-meta {
+  margin-top: 18px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface);
+}
+.retrieval-meta summary {
+  cursor: pointer; padding: 14px 16px; color: var(--mtu-gold);
+  font-weight: 700; font-size: 13px;
+}
+.retrieval-meta-grid {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 9px 18px; padding: 0 16px 16px;
+  font-size: 13px;
+}
+.retrieval-meta-grid span { color: var(--text-faint); }
+.retrieval-meta-grid strong { color: var(--text); text-align: right; }
+
+@media (max-width: 560px) {
+  .retrieval-metrics { grid-template-columns: 1fr; }
+}
