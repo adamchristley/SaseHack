@@ -6,19 +6,17 @@ and **scholarships** they're actually eligible for.
 
 > Students lose money to *not knowing*, not to overspending.
 
-This repo is **Parker's slice**: the data + the two engines (discount search,
-scholarship matching) + a working UI for both. Built as a **pure client-side
-React app**, no backend to run, all logic in the browser, so it's trivial to
-demo and hard to break mid-pitch. (The plan's original FastAPI/Postgres stack
-was swapped for JS since that's the team's language; the search and matching
-logic map 1:1.)
+This repo contains the scholarship/discount data, matching logic, resume
+understanding pipeline, and working React UI. Most ranking logic stays local and
+deterministic; Gemini-backed extraction and semantic retrieval run through small
+server-side API endpoints so the API key never ships to the browser.
 
 ## Run it
 
 ```bash
 npm install
 npm run dev      # frontend only; local extraction + deterministic retrieval work
-npm run dev:full # Vercel dev server, including /api Gemini endpoints
+npm run dev:full # Vite + local Node API server for Gemini endpoints
 npm test         # node built-in test runner
 npm run build    # production build to dist/
 ```
@@ -125,8 +123,19 @@ The API key is only read by serverless functions. Do not put it in `VITE_*` vari
 - **BM25** finds exact profile/scholarship term overlap.
 - **Gemini Embedding 2** finds conceptual similarity.
 - **Reciprocal Rank Fusion (RRF)** combines the independent rankings without assuming their raw scores are calibrated.
-- **Deterministic eligibility** still applies GPA, major, year, location, deadline, and scam filters.
+- **Deterministic eligibility** applies GPA, major, year, age, citizenship, graduate-study intent, location, deadline, and scholarship-specific requirements.
+- Scholarship embeddings are cached on warm API instances so profile edits normally require only a new query embedding.
 - Cards expose rule score, BM25 score, semantic similarity, and RRF contribution for a judge-friendly technical demo.
+
+### Adaptive follow-up questions
+
+The resume is never treated like a complete scholarship application. After
+retrieval, the UI inspects only the current candidate scholarships and asks up
+to three optional questions that could actually change eligibility, such as GPA,
+citizenship, or graduate-study plans. Users can skip any question.
+
+Sensitive eligibility groups are never inferred and are not automatically
+prompted. They can only be self-declared in the full profile editor.
 
 ### Bayesian ranking optimization
 
@@ -136,6 +145,10 @@ The API key is only read by serverless functions. Do not put it in `VITE_*` vari
 rules + RRF + semantic similarity
 ```
 
-The objective is mean nDCG@5 on a small team-labeled relevance benchmark. The current benchmark is intentionally a hackathon validation set, not evidence of production-quality generalization. Review the labels and add more profiles before quoting benchmark results in the pitch.
+The objective is mean graded nDCG@5 on the validation cases in
+`src/data/rankingBenchmark.js`. The current benchmark contains 10 synthetic
+student profiles with 0-3 relevance judgments and is intentionally a hackathon
+validation set, not evidence of production-quality generalization. Review the
+labels as a team before quoting benchmark results in the pitch.
 
 The tuner requires `GEMINI_API_KEY` because it computes semantic embeddings, then prints the best weight triple to copy into `src/data/rankingWeights.js`.
