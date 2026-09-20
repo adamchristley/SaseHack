@@ -312,3 +312,17 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 560px) {
   .retrieval-metrics { grid-template-columns: 1fr; }
 }
+
+
+/* ---- eligibility uncertainty ------------------------------------------- */
+.eligibility-warning {
+  display: grid; gap: 3px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--warn);
+  background: rgba(255, 184, 77, 0.08);
+}
+.eligibility-warning strong { color: var(--warn); font-size: 13px; }
+.eligibility-warning span { color: var(--text-dim); font-size: 12px; }
+.potential-note { color: var(--text-dim); font-size: 13px; margin: 0 0 14px; }
+.resume-ai-error { color: var(--warn); }
