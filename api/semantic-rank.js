@@ -5,6 +5,9 @@ const OUTPUT_DIMENSIONS = 768
 const MAX_DOCUMENTS = 80
 const MAX_TEXT_CHARS = 2500
 
+// Warm serverless instances reuse scholarship vectors across profile edits.
+let documentCache = { key: null, vectors: null }
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
@@ -36,34 +39,54 @@ export default async function handler(req, res) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
 
   try {
-    const result = await ai.models.embedContent({
+    const cacheKey = cleaned
+      .map((doc) => `${doc.id}:${doc.text}`)
+      .join('\u241f')
+    const cacheHit = documentCache.key === cacheKey && Array.isArray(documentCache.vectors)
+
+    let documentVectors = documentCache.vectors
+    if (!cacheHit) {
+      const documentResult = await ai.models.embedContent({
+        model: MODEL,
+        contents: cleaned.map((doc) => ({ parts: [{ text: doc.text }] })),
+        config: {
+          taskType: 'SEMANTIC_SIMILARITY',
+          outputDimensionality: OUTPUT_DIMENSIONS,
+        },
+      })
+
+      const documentEmbeddings = documentResult.embeddings || []
+      if (documentEmbeddings.length !== cleaned.length) {
+        return res.status(502).json({ error: 'Unexpected scholarship embedding response size.' })
+      }
+
+      documentVectors = documentEmbeddings.map((embedding) => embedding?.values || [])
+      documentCache = { key: cacheKey, vectors: documentVectors }
+    }
+
+    const queryResult = await ai.models.embedContent({
       model: MODEL,
-      // Gemini Embedding 2 returns one embedding per Content object. Passing
-      // bare strings can be interpreted as parts of one aggregated input.
-      contents: [
-        { parts: [{ text: query.slice(0, MAX_TEXT_CHARS) }] },
-        ...cleaned.map((doc) => ({ parts: [{ text: doc.text }] })),
-      ],
+      contents: [{ parts: [{ text: query.slice(0, MAX_TEXT_CHARS) }] }],
       config: {
         taskType: 'SEMANTIC_SIMILARITY',
         outputDimensionality: OUTPUT_DIMENSIONS,
       },
     })
 
-    const embeddings = result.embeddings || []
-    if (embeddings.length !== cleaned.length + 1) {
-      return res.status(502).json({ error: 'Unexpected embedding response size.' })
+    const queryVector = queryResult.embeddings?.[0]?.values || []
+    if (!queryVector.length) {
+      return res.status(502).json({ error: 'Gemini did not return a query embedding.' })
     }
 
-    const queryVector = embeddings[0]?.values || []
     const scores = cleaned.map((doc, index) => ({
       id: doc.id,
-      score: cosine(queryVector, embeddings[index + 1]?.values || []),
+      score: cosine(queryVector, documentVectors[index] || []),
     })).sort((a, b) => b.score - a.score)
 
     return res.status(200).json({
       model: MODEL,
       dimensions: OUTPUT_DIMENSIONS,
+      document_cache: cacheHit ? 'hit' : 'miss',
       scores,
     })
   } catch (error) {
