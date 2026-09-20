@@ -79,7 +79,7 @@ export function verifiedProfileFromAnalysis(resumeText, analysis, model = 'unkno
   if (!profile.majors.length) missing.push('major')
   if (!profile.year_level) missing.push('year level')
   if (profile.gpa == null) missing.push('GPA')
-  if (!profile.state) missing.push('state')
+  if (!profile.state) missing.push('residency state')
   if (!profile.school) missing.push('school')
 
   const fieldsFound = Object.entries(profile)
