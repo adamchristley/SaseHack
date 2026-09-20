@@ -1,0 +1,95 @@
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 64px;
+    background: #1B6B4A;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-inline: 32px;
+}
+
+.brand {
+    display: flex; 
+    align-items: center;  
+    flex-shrink: 0;
+}
+.brand:hover { color:inherit}
+
+.brand-name {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 26px;
+    color: #FBFAF6; letter-spacing: -0.01em;
+}
+.campus-chip {
+    font-size: 12px; font-weight: 500; color: #D6E6DC;
+    border: 1px solid #47876B; border-radius: 999px;
+    padding: 4px 11px; white-space: nowrap;
+}
+
+.icon {
+    height: 37px;
+    margin-bottom: 9px;
+}
+
+.unclaimed {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    color: #FBFAF6;
+    letter-spacing: -0.01em;
+}
+
+.site-nav {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    font-size: 14.5px;
+    font-weight: 500;
+}
+
+.site-nav a {color: #D6E6DC;}
+.site-nav a:hover {color: #FBFAF6;}
+.site-nav a[aria-current="page"] {color: #FBFAF6; font-weight: 600;}
+
+.header-login {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #D6E6DC;
+    margin-left: 10px;
+}
+
+.header-login:hover {color: #FBFAF6;}
+
+.avatar {
+    width: 32px; height: 32px; border-radius: 999px;
+    background: #FBFAF6; color: #124D26;
+    display: grid; place-items: center;
+    font-size: 12.5px; font-weight: 700;
+    margin-left: 12px;
+}
+
+.header-cta {
+    font-size: 14px;
+    font-weight: 600;
+    color: #124D36;
+    background: #FBFAF6;
+    border-radius: 8px;
+    padding: 9px 22px;
+    white-space: nowrap;
+}
+
+.header-cta:hover {
+    color: #124D36;
+    background: #FFFFFF;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 1px solid #47876B;
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #FBFAF6;
+}
+

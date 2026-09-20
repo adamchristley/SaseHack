@@ -1,0 +1,35 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; gap: 8px;
+    font-size: 14px; font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    transition: background .15s cubic-bezier(.22, .61, .36, 1), border-color .15s cubic-bezier(.22, .61, .36, 1), color .15s cubic-bezier(.22, .61, .36, 1);
+    min-height: 44px;
+}
+
+.btn-lg {font-size: 16px; padding: 15px 30px; border-radius: 10px;}
+.btn-sm {font-size: 13.5px; padding: 8px 16px; min-height: 38px;}
+
+.btn-primary {background: #1B6B4A; border-color: #1B6B4A; color: #FBFAF6}
+.btn-primary:hover {background: #124D36; border-color: #124D36; color: #FBFAF6;}
+
+.btn-secondary {background: #FFFFFF; border-color: #C9C3B2; color: #191814; font-weight: 500;}
+.btn-secondary:hover {border-color: #57544B; color: #191814;}
+
+.btn-emphasis {background: #191814; border-color: #191814; color: #FBFAF6;}
+.btn-emphasis:hover {background: #000; color: #FBFAF6;}
+
+.btn-invert {background: #FBFAF6; border-color: #FBFAF6; color: #124D36;}
+.btn-invert:hover {background: #fff; color: #124D36;}
+
+.btn-onDark {background: transparent; border-color: #45403A; color: #FBFAF6; font-weight: 500;}
+.btn-onDark:hover {border-color: #FBFAF6; color: #FBFAF6;}
+
+.btn:disabled, .btn[aria-disabled="true"]{
+    background: #F1EFE8; border-color: #E4E0D6; color: #96918A; cursor: not-allowed;
+}
+
+.btn-block{width: 100%;}
