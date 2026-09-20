@@ -17,8 +17,9 @@ logic map 1:1.)
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm test         # 20 tests, node built-in runner, no deps
+npm run dev      # frontend only; local extraction + deterministic retrieval work
+npm run dev:full # Vercel dev server, including /api Gemini endpoints
+npm test         # node built-in test runner
 npm run build    # production build to dist/
 ```
 
@@ -77,3 +78,64 @@ Beans / aggregators.
 Keyboard navigable, visible focus states, real labels on the search input and
 all profile fields, MTU-gold-on-dark contrast. (Education/Accessibility is a
 scored track, the plan says judges check.)
+
+
+## Adam's resume + advanced retrieval pipeline
+
+The scholarship flow is deliberately split into understanding, retrieval, eligibility, and ranking:
+
+```
+resume PDF
+   |
+PDF.js text extraction
+   |
+Gemini 3.1 Flash-Lite structured extraction
+   |
+evidence verifier (rejects unsupported model claims)
+   |
+StudentProfile
+   |
+   +--> BM25 lexical retrieval ------------------+
+   |                                             |
+   +--> Gemini Embedding 2 semantic retrieval ---+--> Reciprocal Rank Fusion
+                                                     |
+                                             deterministic eligibility
+                                                     |
+                                             weighted reranking
+                                                     |
+                                            explainable top matches
+```
+
+The model never creates scholarships and never makes the final eligibility decision. Every AI-extracted fact must carry resume evidence, and the client verifies that evidence against the original extracted text before adding it to the profile.
+
+If Gemini is unavailable, the app automatically falls back to the local deterministic resume parser plus BM25 and rule-based scholarship ranking.
+
+### Free Gemini setup
+
+1. Create a Gemini API key in Google AI Studio.
+2. Copy `.env.example` to `.env.local`.
+3. Set `GEMINI_API_KEY`.
+4. Run `npm install`.
+5. Run `npm run dev:full` so Vercel serves both Vite and the `/api` functions.
+
+The API key is only read by serverless functions. Do not put it in `VITE_*` variables or client-side code.
+
+### Hybrid retrieval
+
+- **BM25** finds exact profile/scholarship term overlap.
+- **Gemini Embedding 2** finds conceptual similarity.
+- **Reciprocal Rank Fusion (RRF)** combines the independent rankings without assuming their raw scores are calibrated.
+- **Deterministic eligibility** still applies GPA, major, year, location, deadline, and scam filters.
+- Cards expose rule score, BM25 score, semantic similarity, and RRF contribution for a judge-friendly technical demo.
+
+### Bayesian ranking optimization
+
+`npm run tune:ranking` runs an offline Gaussian-process Bayesian optimizer over the three runtime weights:
+
+```
+rules + RRF + semantic similarity
+```
+
+The objective is mean nDCG@5 on a small team-labeled relevance benchmark. The current benchmark is intentionally a hackathon validation set, not evidence of production-quality generalization. Review the labels and add more profiles before quoting benchmark results in the pitch.
+
+The tuner requires `GEMINI_API_KEY` because it computes semantic embeddings, then prints the best weight triple to copy into `src/data/rankingWeights.js`.
