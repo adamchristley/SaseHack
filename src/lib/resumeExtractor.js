@@ -219,11 +219,21 @@ function findMajors(lines) {
       inEducation = false
     }
 
-    if (
-      inEducation ||
-      /\b(b\.?s\.?|bachelor|m\.?s\.?|master|ph\.?d\.?|major(?:ing)?|degree|student)\b/i.test(line)
-    ) {
+    if (inEducation) {
       candidates.push(line)
+      continue
+    }
+
+    if (/\b(b\.?s\.?|bachelor|m\.?s\.?|master|ph\.?d\.?|major(?:ing)?|degree)\b/i.test(line)) {
+      candidates.push(line)
+      continue
+    }
+
+    // A line such as "Senior computer science student focused on machine
+    // learning and cybersecurity" should identify computer science as the
+    // degree, not treat every subject mentioned after "student" as a major.
+    if (/\bstudent\b/i.test(line)) {
+      candidates.push(line.split(/\bstudent\b/i)[0])
     }
   }
 
