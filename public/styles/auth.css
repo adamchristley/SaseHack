@@ -1,0 +1,53 @@
+/*Login & Register page*/
+.auth {
+    min-height: calc(100vh - 64px);
+    display: grid; place-items: center;
+    padding: 48px 24px;
+}
+.auth-shell { width: 100%; max-width: 420px; }
+.auth-card {
+    width: 100%;
+    background: #FFFFFF; border: 1px solid #E4E0D6;
+    border-radius: 16px; padding: 36px 32px 32px;
+}
+.auth-card h1 {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
+    font-size: 34px; line-height: 1.1; letter-spacing: -0.02em;
+}
+.auth-sub { font-size: 14.5px; line-height: 1.55; color: #57544B; margin: 8px 0 26px; }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: #191814; margin-bottom: 6px; }
+.field input {
+    width: 100%; min-height: 48px; padding: 12px 14px;
+    font-family: inherit; font-size: 15px; color: #191814;
+    background: #FFFFFF; border: 1px solid #C9C3B2; border-radius: 8px;
+    transition: border-color .15s ease-out;
+}
+.field input::placeholder { color: #8E887E }
+.field input:focus { border-color: #1B6B4A }
+
+.field-head{
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 6x;
+}
+.field-head label {margin-bottom: 0}
+.field-head a { font-size: 13px; font-weight: 500; }
+
+.divider {margin: 20px 0; text-align: center; font-size: 13px; color: #57544B;}
+#message:not(:empty) {margin-bottom: 20px;}
+.alert {
+    border: 1px solid transparent; border-radius: 9px;
+    padding: 12px 14px; font-size: 14px; line-height: 1.5;
+}
+.alert-danger {background: #FBEFE7; border-color: #F0D8C6; color: #8F3F17;}
+.alert-success {background: #EBF2ED; border-color: #CFE0D6; color: #124D36;}
+
+.auth-foot {text-align: center; font-size: 14px; color: #57544B; margin-top: 22px;}
+.auth-foot a {font-weight: 600;}
+.auth-note {font-size: 12.5px; line-height: 1.5; color: #57544B; text-align: center; margin-top: 18px;}
+
+@media (max-width: 480px) {
+    .auth {padding: 24px 16px;}
+    .auth-card {padding: 28px 22px 26px; border-radius: 14px;}
+}

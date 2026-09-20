@@ -1,0 +1,123 @@
+/* dashboard */
+
+.dash-top {display: flex; align-items: flex-end; gap: 48px; flex-wrap: wrap;}
+.dash-total {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    font-size: clamp(60px, 8vw, 108px);
+    line-height: .92; letter-spacing: -0.025em;
+}
+
+.dash-tiles {display: flex; gap: 14px; flex-wrap: wrap;}
+.tile {
+    width: 236px;
+    background: #FFFFFF; border: 1px solid #E4E0D6;
+    border-radius: 12px; padding: 18px 20px 20px;
+}
+.tile-green {background: #1B6B4A; border-color: #1B6B4A; color: #FBFAF6;}
+.tile .z {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: #57544B;
+}
+.tile .y {
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 34px; font-weight: 600; letter-spacing: -0.02em; margin-top: 8px;
+}
+.tile .x {font-size: 13px; line-height: 1.4; margin-top: 6px; color: #57544B;}
+.tile-green .z, .tile-green .x {color: #C6E0D2}
+
+
+/* deadline banner*/
+.urgency{
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: #FBEFE7; border: 1px solid #F0D8C6;
+    border-radius: 10px; padding: 14px 18px;
+    font-size: 14.5px; color: #8F3F17;
+}
+.urgency strong {font-weight: 600}
+.urgency a {color: #8F3F17; font-weight:600; margin-left: auto; text-decoration: underline;}
+
+
+.dash-body {
+    display: grid; grid-template-columns: minmax(0, 1fr) 352px;
+    gap: 32px; align-items: start;
+}
+.stack {display: flex; flex-direction: column;}
+.row {display: flex; align-items: center;}
+
+
+/* filters*/
+.filters {display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;}
+.filter {
+    min-height: 36px; padding: 7px 15px;
+    font-size: 13px;font-weight: 500; color:#57544B;
+    background: #FFFFFF; border: 1px solid #E4E0D6; border-radius: 999px;
+}
+.filter:hover {border-color: #C9C3B2}
+.filter[aria-pressed="true"]{background: #191814; border-color: #191814; color: #FBFAF6;font-weight: 600;}
+
+/* cards*/
+.opportunity {display: flex; flex-direction: column; gap: 13px;}
+.opportunity + .opportunity{margin-top: 16px;}
+.opp-head {display: flex; align-items: flex-start; gap: 16px;}
+.opp-head h3 {font-size: 19px;}
+.opp-head p {font-size: 14px; line-height: 1.5; color: #57544B; margin-top: 6px;}
+.opp-amount {text-align: right; flex-shrink: 0;}
+.opp-amount .v {
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 24px; font-weight: 600; letter-spacing:-0.02em;
+}
+.opp-amount .d {font-size: 12.5px; margin-top: 3px; color: #57544B;}
+.opp-amount .d.is-urgent {color: #8F3F17; font-weight: 600;}
+
+.badge {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; border-radius: 999px; padding: 4px 10px;
+}
+.badge-scholarship {background: #EBF2ED; color: #1B6B4A}
+.badge-amenity {background: #FBEFE7; color: #8F3F17}
+.flag {font-size: 12px; color: #8E887E;}
+
+.opp-reasons {display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 12px; color: #57544B;}
+.opp-foot {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    border-top: 1px solid #F1EFE8; padding-top: 13px;
+}
+.opp-foot .btn {margin-left: 0}
+.source-link {display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500}
+
+/* sidebar */
+.panel-green {background: #EBF2ED; border: 1px solid #CFE0D6; border-radius: 12px; padding: 24px;}
+.panel-green h4 {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
+    font-size: 22px; color: #124D36;
+}
+.panel-green > p {font-size: 13.5px; line-height: 1.5; color: #2F5C47; margin: 4px 0 16px;}
+
+.boost {display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 9px; padding: 13px 14px;}
+.boost + .boost {margin-top: 10px;}
+.boost .t {font-size: 13.5px; font-weight: 600;}
+.boost .s {font-size: 12px; color: #57544B; margin-top: 2px;}
+.boost .v {
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 15px; font-weight: 600; color: #1B6B4A; margin-left: auto;
+}
+
+/* claimed*/
+.claimed .v{
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 8px 0 16px;
+}
+.meter {height: 6px; border-radius: 999px; background: #F1EFE8; overflow: hidden; margin-bottom: 16px;}
+.meter span {display: block; height: 100%; background: #1B6B4A;}
+.claimed li {display: flex; align-items: center; gap: 10px; font-size: 13.5px;}
+.claimed li + li {margin-top: 11px;}
+.claimed li .amt {
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo,  monospace;
+    font-size: 13px; color: #57544B; margin-left: auto;
+}
+
+
+@media (max-width: 900px) {
+    .dash-body {grid-template-columns: minmax(0, 1fr);}
+    .dash-tiles .tile {width: auto; flex: 1 1 200px;}
+}

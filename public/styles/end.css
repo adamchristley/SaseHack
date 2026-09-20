@@ -11,7 +11,7 @@
     grid-template-columns: repeat(3,1fr); gap: 48px;
 }
 .step .num {
-    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 58px; line-height: 1;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 58px; line-height: 1;
     color: #1B6B4A; letter-spacing: -0.02em;
 }
 .step .dot {
@@ -34,7 +34,7 @@
 .card-dark .rule {background: #3E9A72;}
 .source-card:nth-child(3) .rule {background-color: #B4511F;}
 .source-card .amount {
-    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 42px; line-height: 1;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 42px; line-height: 1;
     letter-spacing: -0.02em; margin-top: 20px;
 }
 .source-card .amount small {font-size: 22px; color: #57544B;}
@@ -42,7 +42,7 @@
 /* Goal */
 .goal {border-top: 1px solid #E4E0D6; padding-top: 48px;}
 .goal h2 {
-    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-weight: 400;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
     font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15; letter-spacing: -0.02em;
     max-width: 900px;
 }
@@ -55,7 +55,7 @@
     text-align: center; padding-block: 80px;
 }
 .closing h2 {
-    font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-weight: 400;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
     font-size: clamp(32px, 4.2vw, 52px); line-height: 1; letter-spacing: -0.025em;
     color: #FBFAF6;
 }
@@ -68,7 +68,7 @@
     display: flex; align-items: center; flex-wrap: wrap; gap:16px;
     font-size: 13px; color: #57544B;
 }
-.site-footer .mark {font-family: 'Instrument Serif', Gerogia, 'Times New Roman', serif; font-size: 19px; color: #191814;}
+.site-footer .mark {font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 19px; color: #191814;}
 .site-footer nav { display: flex; gap: 16px; margin-left: auto;}
 .site-footer nav a {color: #57544B;}
 .site-footer nav a:hover {color: #191814;}

@@ -1,36 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-    <title>Registration Form</title>
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register</title>
+        <link rel="icon" href="images/icon.png" type="image/png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
+
+        <link rel="stylesheet" href="styles/header.css">
+        <link rel="stylesheet" href="styles/home.css">
+        <link rel="stylesheet" href="styles/button.css">
+        <link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
-    <div class="container">
+
+<header class="site-header">
+    <a class="brand" href="index.html">
+        <img class="icon" src="images/icon.png" alt="">
+        <span class="unclaimed"> Unclaimed</span>
+    </a>
+</header>
+
+<main class="auth">
+<div class="auth-shell">
+    <div class="auth-card">
+        <h1>Create an account</h1>
+    
         <div id="message"></div>
 
-        <form id="register-form">
-            <div class="form-group">
-                <input type="text" id="fullname" class="form-control" placeholder="Full name:" required>
+        <form id="register-form" novalidate>
+            <div class="field">
+                <label for="fullname">Full name</label>
+                <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Adam Parker" required>
             </div>
-            <div class="form-group">
-                <input type="email" id="email" class="form-control" placeholder="Email:" required>
+
+            <div class="field">
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
             </div>
-            <div class="form-group">
-                <input type="password" id="password" class="form-control" placeholder="Password:" required>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
             </div>
-            <div class="form-group">
-                <input type="password" id="repeat" class="form-control" placeholder="Repeat Password:" required>
+
+            <div class="field">
+                <label for="repeat">Repeat password</label>
+                <input type="password" id="repeat" name="repeat" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
             </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Register">
-            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Create account</button>
         </form>
-        <div><p>Already registered? <a href="login.html">Login</a></p></div>
+
+        <p class="auth-note">Find new opportunities and get what you deserve.</p>
+        <p class="auth-note" style="margin-top: 3px;"> Prefer Google? Use <a href="login.html">Continue with Google</a> on the login page and it makes your account on first use.</p>
     </div>
 
-    <script type="module" src="register.js"></script>
+    <p class="auth-foot">Already registered? <a href="login.html">Log in</a></p>
+</div>
+</main>
+
+<script type="module" src="register.js"></script>
 </body>
 </html>
