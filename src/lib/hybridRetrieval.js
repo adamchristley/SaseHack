@@ -1,4 +1,4 @@
-import { isEligible, scoreMatch } from './matching.js'
+import { assessEligibility, scoreMatch } from './matching.js'
 import { RANKING_WEIGHTS } from '../data/rankingWeights.js'
 
 const RRF_K = 60
@@ -8,22 +8,28 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
   let semantic = []
   let semanticAvailable = false
   let semanticModel = null
+  let semanticError = null
 
   try {
     const result = await fetchSemanticRanking(scholarships, profile)
     semantic = result.scores
     semanticAvailable = true
     semanticModel = result.model
-  } catch {
-    // Keep the local retrieval path alive when the Gemini endpoint is absent.
+  } catch (error) {
+    semanticError = error instanceof Error ? error.message : 'Semantic retrieval unavailable'
   }
 
   const today = new Date()
-  const eligible = scholarships.filter((s) => isEligible(s, profile, today))
-  const ruleRows = eligible.map((s) => {
-    const { score, reasons } = scoreMatch(s, profile, today)
-    return { scholarship: s, ruleScore: score, reasons }
-  })
+  const ruleRows = scholarships
+    .map((scholarship) => ({
+      scholarship,
+      eligibility: assessEligibility(scholarship, profile, today),
+    }))
+    .filter((row) => row.eligibility.status !== 'ineligible')
+    .map((row) => {
+      const { score, reasons } = scoreMatch(row.scholarship, profile, today)
+      return { ...row, ruleScore: score, reasons }
+    })
 
   const lexicalRank = rankMap(lexical)
   const semanticRank = rankMap(semantic)
@@ -51,7 +57,7 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
   const lexicalNorm = normalizer(fused.map((x) => x.lexicalScore))
   const rrfNorm = normalizer(fused.map((x) => x.rrf))
 
-  const matches = fused.map((row) => {
+  const ranked = fused.map((row) => {
     const ruleSignal = ruleNorm(row.ruleScore)
     const lexicalSignal = lexicalNorm(row.lexicalScore)
     const semanticSignal = semanticAvailable
@@ -78,6 +84,7 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
       scholarship: row.scholarship,
       score: Math.round(finalScore * 10) / 10,
       reasons,
+      eligibility: row.eligibility,
       retrieval: {
         rule_score: round(row.ruleScore, 2),
         lexical_score: round(row.lexicalScore, 3),
@@ -87,13 +94,22 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
     }
   })
     .sort((a, b) => b.score - a.score)
+
+  const matches = ranked
+    .filter((row) => row.eligibility.status === 'eligible')
+    .slice(0, limit)
+
+  const needsInfo = ranked
+    .filter((row) => row.eligibility.status === 'needs_info')
     .slice(0, limit)
 
   return {
     matches,
+    needs_info: needsInfo,
     meta: {
       mode: semanticAvailable ? 'hybrid' : 'hybrid-local',
       semantic_model: semanticModel,
+      semantic_error: semanticError,
       lexical_method: 'BM25',
       fusion_method: 'Reciprocal Rank Fusion',
       weights: semanticAvailable
