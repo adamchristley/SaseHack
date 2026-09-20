@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { createGenAI, friendlyGeminiError, withGeminiRetry } from '../api/genai-client.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,15 +27,22 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1)
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+const ai = createGenAI(process.env.GEMINI_API_KEY)
 const cases = []
 
 for (const item of benchmark) {
   console.log(`Embedding benchmark case: ${item.name}`)
-  cases.push({
-    ...item,
-    signals: await buildSignals(item.profile),
-  })
+  try {
+    cases.push({
+      ...item,
+      signals: await buildSignals(item.profile),
+    })
+  } catch (error) {
+    console.error('\nCould not reach Gemini while building the ranking benchmark.')
+    console.error(friendlyGeminiError(error))
+    console.error('The optimizer needs semantic embeddings, so no weights were changed. Retry when Gemini is reachable.')
+    process.exit(1)
+  }
 }
 
 const initial = [
@@ -139,7 +146,7 @@ async function buildSignals(profile) {
 async function semanticRank(profile) {
   const query = buildProfileQuery(profile)
   const docs = scholarships.map(scholarshipSearchText)
-  const result = await ai.models.embedContent({
+  const result = await withGeminiRetry(() => ai.models.embedContent({
     model: MODEL,
     contents: [
       { parts: [{ text: query }] },
@@ -149,7 +156,7 @@ async function semanticRank(profile) {
       taskType: 'SEMANTIC_SIMILARITY',
       outputDimensionality: 128,
     },
-  })
+  }))
 
   const embeddings = result.embeddings || []
   const queryVector = embeddings[0]?.values || []
