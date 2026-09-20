@@ -5,6 +5,7 @@ import { advancedScholarshipMatches } from '../lib/hybridRetrieval.js'
 import ProfilePanel from '../components/ProfilePanel.jsx'
 import ResumeUpload from '../components/ResumeUpload.jsx'
 import ScholarshipCard from '../components/ScholarshipCard.jsx'
+import AdaptiveQuestions from '../components/AdaptiveQuestions.jsx'
 
 const EMPTY_PROFILE = {
   majors: [], year_level: null, gpa: null, state: null, school: null,
@@ -39,7 +40,8 @@ export default function Scholarships() {
 
   const hasProfile = profile.majors.length || profile.affiliations.length ||
     profile.skills.length || profile.interests.length || profile.work_experience.length ||
-    profile.year_level || profile.gpa != null || profile.state || profile.school
+    profile.year_level || profile.gpa != null || profile.state || profile.school ||
+    profile.age != null || profile.citizenship || profile.graduate_plan
 
   useEffect(() => {
     let cancelled = false
@@ -99,12 +101,16 @@ export default function Scholarships() {
       <div className="sch-layout">
         <div className="sch-sidebar">
           <ResumeUpload onProfile={setProfile} />
-          <ProfilePanel
-            profile={profile}
-            onChange={setProfile}
-            onLoadSample={() => setProfile(SAMPLE_PROFILE)}
-            onClear={() => setProfile(EMPTY_PROFILE)}
-          />
+
+          <details className="profile-editor">
+            <summary>Edit full profile</summary>
+            <ProfilePanel
+              profile={profile}
+              onChange={setProfile}
+              onLoadSample={() => setProfile(SAMPLE_PROFILE)}
+              onClear={() => setProfile(EMPTY_PROFILE)}
+            />
+          </details>
         </div>
 
         <div className="sch-results">
@@ -113,6 +119,14 @@ export default function Scholarships() {
               <span className={'ranking-dot ranking-dot--' + (rankingStatus === 'hybrid' ? 'live' : 'local')} />
               {rankingLabel}
             </div>
+          )}
+
+          {hasProfile && (
+            <AdaptiveQuestions
+              needsInfo={needsInfo}
+              profile={profile}
+              onChange={setProfile}
+            />
           )}
 
           {!hasProfile ? (
@@ -158,8 +172,8 @@ export default function Scholarships() {
                     These are not confirmed matches. The resume does not provide one or more required facts, so we keep them separate instead of assuming eligibility.
                   </p>
                   <div className="card-grid">
-                    {needsInfo.map((match, index) => (
-                      <ScholarshipCard key={match.scholarship.id} match={match} rank={index + 1} />
+                    {needsInfo.map((match) => (
+                      <ScholarshipCard key={match.scholarship.id} match={match} />
                     ))}
                   </div>
                 </details>
