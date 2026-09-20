@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import scholarships from '../src/data/scholarships.js'
-import { isEligible, scoreMatch } from '../src/lib/matching.js'
+import { assessEligibility, scoreMatch } from '../src/lib/matching.js'
 import {
   bm25Rank,
   buildProfileQuery,
@@ -151,7 +151,7 @@ console.log(`semantic: ${best[2].toFixed(4)}`)
 console.log('\nPaste these into src/data/rankingWeights.js after reviewing the benchmark.')
 
 async function buildSignals(profile) {
-  const eligible = scholarships.filter((s) => isEligible(s, profile))
+  const eligible = scholarships.filter((s) => assessEligibility(s, profile).status === 'eligible')
   const lexical = bm25Rank(scholarships, profile)
   const semantic = await semanticRank(profile)
 
@@ -193,7 +193,10 @@ async function semanticRank(profile) {
   const docs = scholarships.map(scholarshipSearchText)
   const result = await ai.models.embedContent({
     model: MODEL,
-    contents: [query, ...docs],
+    contents: [
+      { parts: [{ text: query }] },
+      ...docs.map((text) => ({ parts: [{ text }] })),
+    ],
     config: {
       taskType: 'SEMANTIC_SIMILARITY',
       outputDimensionality: 128,
