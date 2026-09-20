@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test",
-    "dev:full": "npx vercel dev",
+    "dev:full": "node scripts/dev-full.mjs",
     "tune:ranking": "node scripts/tune-ranking.mjs"
   },
   "dependencies": {
