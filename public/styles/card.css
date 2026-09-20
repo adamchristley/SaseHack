@@ -1,7 +1,7 @@
 .chip {
     display: inline-block;
-    font-size: 12px; font-weight: 500; color: #191814;
-    background: #F1EFE8; border-radius: 5px;
+    font-size: 12px; font-weight: 500; color: #f4f5f7;
+    background: #1e2128; border-radius: 5px;
     padding: 3px 9px;
 }
 
@@ -11,41 +11,41 @@
     border-radius: 5px; padding: 3px 8px;
 }
 
-.badge-scholarship {color: #124D36; background: #EBF2ED;}
-.badge-discount {color: #57544B; background: #F1EFE8;}
-.badge-amenity {color: #8F3F17; background: #FBEFE7;}
+.badge-scholarship {color: #ffcb05; background: #ffcb051f;}
+.badge-discount {color: #a7adba; background: #1e2128;}
+.badge-amenity {color: #ff9b87; background: #e0533d1f;}
 
-.flag {font-size: 12px; font-weight: 600; color: #8F3F17;}
+.flag {font-size: 12px; font-weight: 600; color: #ff9b87;}
 
 .card{
-    background: #FFFFFF;
-    border: 1px solid #E4E0D6;
+    background: #16181d;
+    border: 1px solid #2b2f38;
     border-radius: 12px;
     padding: 24px;
 }
 
-.card-dark {background: #191814; border-color: #191814; color: #FBFAF6;}
-.card-dark p {color: #BFBAAE;}
+.card-dark {background: #1e2128; border-color: #2b2f38; color: #f4f5f7;}
+.card-dark p {color: #a7adba;}
 
 .stat-strip {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    border-bottom: 1px solid #E4E0D6;
+    border-bottom: 1px solid #2b2f38;
     padding-block: 32px;
 }
 
-.stat-strip > div + div {border-left: 1px solid #E4E0D6; padding-left: 48px;}
+.stat-strip > div + div {border-left: 1px solid #2b2f38; padding-left: 48px;}
 .stat-strip .value {font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 30px; font-weight: 600; }
-.stat-strip .label {font-size: 13.5px; color: #57544B; margin-top: 4px;}
+.stat-strip .label {font-size: 13.5px; color: #a7adba; margin-top: 4px;}
 
 @media (max-width: 900px){
     .section {padding-block: 56px;}
     .begin-inner {grid-template-columns: 1fr; gap: 48px; padding-block: 56px;}
     .steps-grid {grid-template-columns: 1fr; gap: 32px;}
     .steps::before {display:none;}
-    .source-grid {grid-template: 1fr;}
+    .source-grid {grid-template-columns: 1fr;}
     .source-card:nth-child(2), .source-card:nth-child(3) {margin-top: 0;}
     .goal-cols {grid-template-columns: 1fr; gap: 24px;}
     .stat-strip {grid-template-columns: 1fr; gap: 24px;}
-    .stat-strip > div + div {border-left: 0; padding-left: 0; border-top: 1px solid #E4E0D6; padding-top: 24px;}
+    .stat-strip > div + div {border-left: 0; padding-left: 0; border-top: 1px solid #2b2f38; padding-top: 24px;}
 }
