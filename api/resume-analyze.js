@@ -1,54 +1,50 @@
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI, Type } from '@google/genai'
 
 const MODEL = 'gemini-3.1-flash-lite'
 const MAX_TEXT_CHARS = 30000
 
 const factString = {
-  type: 'object',
-  additionalProperties: false,
+  type: Type.OBJECT,
   properties: {
-    value: { type: 'string' },
-    evidence: { type: 'string' },
-    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    value: { type: Type.STRING },
+    evidence: { type: Type.STRING },
+    confidence: { type: Type.NUMBER, minimum: 0, maximum: 1 },
   },
   required: ['value', 'evidence', 'confidence'],
 }
 
 const maybeString = {
-  type: 'object',
-  additionalProperties: false,
+  type: Type.OBJECT,
   properties: {
-    value: { type: ['string', 'null'] },
-    evidence: { type: ['string', 'null'] },
-    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    value: { type: Type.STRING, nullable: true },
+    evidence: { type: Type.STRING, nullable: true },
+    confidence: { type: Type.NUMBER, minimum: 0, maximum: 1 },
   },
   required: ['value', 'evidence', 'confidence'],
 }
 
 const maybeNumber = {
-  type: 'object',
-  additionalProperties: false,
+  type: Type.OBJECT,
   properties: {
-    value: { type: ['number', 'null'], minimum: 0, maximum: 4 },
-    evidence: { type: ['string', 'null'] },
-    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    value: { type: Type.NUMBER, nullable: true, minimum: 0, maximum: 4 },
+    evidence: { type: Type.STRING, nullable: true },
+    confidence: { type: Type.NUMBER, minimum: 0, maximum: 1 },
   },
   required: ['value', 'evidence', 'confidence'],
 }
 
 const responseSchema = {
-  type: 'object',
-  additionalProperties: false,
+  type: Type.OBJECT,
   properties: {
-    majors: { type: 'array', items: factString, maxItems: 5 },
+    majors: { type: Type.ARRAY, items: factString },
     year_level: maybeString,
     gpa: maybeNumber,
     state: maybeString,
     school: maybeString,
-    affiliations: { type: 'array', items: factString, maxItems: 12 },
-    skills: { type: 'array', items: factString, maxItems: 30 },
-    interests: { type: 'array', items: factString, maxItems: 20 },
-    work_experience: { type: 'array', items: factString, maxItems: 12 },
+    affiliations: { type: Type.ARRAY, items: factString },
+    skills: { type: Type.ARRAY, items: factString },
+    interests: { type: Type.ARRAY, items: factString },
+    work_experience: { type: Type.ARRAY, items: factString },
   },
   required: [
     'majors', 'year_level', 'gpa', 'state', 'school',
@@ -111,7 +107,7 @@ ${text}
         temperature: 0.05,
         maxOutputTokens: 3500,
         responseMimeType: 'application/json',
-        responseJsonSchema: responseSchema,
+        responseSchema,
       },
     })
 
