@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "test": "node --test",
-    "digest": "node send-digest.js"
+    "digest": "node send-digest.js",
+    "sync": "node sync-data.mjs"
   },
   "dependencies": {
     "firebase-admin": "^12.0.0",
