@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 
 const MODEL = 'gemini-embedding-2'
-const OUTPUT_DIMENSIONS = 256
+const OUTPUT_DIMENSIONS = 768
 const MAX_DOCUMENTS = 80
 const MAX_TEXT_CHARS = 2500
 
@@ -38,7 +38,12 @@ export default async function handler(req, res) {
   try {
     const result = await ai.models.embedContent({
       model: MODEL,
-      contents: [query.slice(0, MAX_TEXT_CHARS), ...cleaned.map((doc) => doc.text)],
+      // Gemini Embedding 2 returns one embedding per Content object. Passing
+      // bare strings can be interpreted as parts of one aggregated input.
+      contents: [
+        { parts: [{ text: query.slice(0, MAX_TEXT_CHARS) }] },
+        ...cleaned.map((doc) => ({ parts: [{ text: doc.text }] })),
+      ],
       config: {
         taskType: 'SEMANTIC_SIMILARITY',
         outputDimensionality: OUTPUT_DIMENSIONS,
@@ -64,7 +69,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Semantic ranking endpoint error', error)
     return res.status(502).json({
-      error: 'Gemini semantic ranking failed.',
+      error: error instanceof Error ? error.message : 'Gemini semantic ranking failed.',
       code: 'GEMINI_UPSTREAM_ERROR',
     })
   }
