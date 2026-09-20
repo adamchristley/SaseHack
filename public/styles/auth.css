@@ -1,0 +1,66 @@
+/* Shared look for login.html / register.html — matches the Charge Up Savings
+   app (same color tokens as src/styles/tokens.css in the React app), kept
+   as its own static file so it never breaks when the app gets rebuilt with
+   a new hashed asset filename. */
+:root{
+  --mtu-gold:#ffcb05; --mtu-black:#000000;
+  --bg:#0c0d10; --surface:#16181d; --surface-2:#1e2128; --border:#2b2f38;
+  --text:#f4f5f7; --text-dim:#a7adba; --text-faint:#6b7280;
+  --bad:#e0533d; --good:#37b26b;
+  --radius:12px; --radius-sm:8px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--font); color:var(--text);
+  background:radial-gradient(1200px 600px at 80% -10%,rgba(255,203,5,.1),transparent 60%),var(--bg);
+  -webkit-font-smoothing:antialiased; line-height:1.55;
+  display:flex; flex-direction:column; min-height:100%;
+}
+a{color:var(--mtu-gold)}
+button{font-family:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--mtu-gold); outline-offset:2px; border-radius:4px}
+
+.topbar{
+  display:flex; align-items:center; gap:10px;
+  padding:16px clamp(16px,4vw,32px); border-bottom:1px solid var(--border);
+}
+.brand{display:flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-size:18px; font-weight:800; letter-spacing:-.01em}
+.brand-mark{display:grid; place-items:center; width:30px; height:30px; background:var(--mtu-gold); color:var(--mtu-black); border-radius:8px; font-size:16px}
+
+.authwrap{flex:1; display:flex; align-items:center; justify-content:center; padding:32px 16px}
+.authcard{width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:32px}
+.h1{font-size:28px; font-weight:800; letter-spacing:-.02em; margin:0 0 6px}
+.lead{color:var(--text-dim); font-size:15px; margin:0 0 24px}
+
+.field{display:flex; flex-direction:column; gap:6px; margin-bottom:16px}
+.field-label{font-size:13px; font-weight:700; color:var(--text-dim)}
+.field input{
+  background:var(--bg); border:1px solid var(--border); color:var(--text);
+  border-radius:var(--radius-sm); padding:11px 12px; font-size:15px; width:100%;
+}
+.field input:focus{border-color:var(--mtu-gold); outline:none}
+
+.btn{width:100%; border:1px solid transparent; border-radius:var(--radius-sm); padding:12px 20px; font-size:15px; font-weight:700; transition:transform .06s ease,background .15s ease; margin-top:4px}
+.btn:active{transform:translateY(1px)}
+.btn--gold{background:var(--mtu-gold); color:var(--mtu-black)}
+.btn--gold:hover{background:#ffd93d}
+.btn--ghost{background:transparent; color:var(--text); border-color:var(--border)}
+.btn--ghost:hover{border-color:var(--mtu-gold); color:var(--mtu-gold)}
+
+.divider{display:flex; align-items:center; gap:10px; color:var(--text-faint); font-size:13px; margin:20px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+.linkrow{text-align:center; font-size:14px; color:var(--text-dim); margin-top:10px}
+.linkrow a{font-weight:700; text-decoration:none}
+.linkrow a:hover{text-decoration:underline}
+
+.alert{border-radius:var(--radius-sm); padding:10px 14px; font-size:14px; margin-bottom:16px; border:1px solid transparent}
+.alert--danger{background:#e0533d1f; border-color:#e0533d55; color:#ff9b87}
+.alert--success{background:#37b26b1f; border-color:#37b26b55; color:#8fe0b3}
+
+.consent{display:flex; gap:10px; align-items:flex-start; margin:4px 0 16px; cursor:pointer}
+.consent input{width:18px; height:18px; margin-top:2px; flex:none; accent-color:var(--mtu-gold); cursor:pointer}
+.consent strong{display:block; font-size:14px; color:var(--text); font-weight:700}
+.consent small{display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px}

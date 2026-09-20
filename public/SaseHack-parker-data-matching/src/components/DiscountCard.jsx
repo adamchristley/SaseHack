@@ -1,5 +1,5 @@
 // Result card. Shows the offer, how to claim, what verification is needed,
-// the source link, and — the differentiator — when we last verified it.
+// the source link, and, the differentiator, when we last verified it.
 
 const VERIF_LABEL = {
   sheerid: 'SheerID',

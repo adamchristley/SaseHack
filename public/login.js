@@ -14,7 +14,7 @@ function show(type, text) {
   box.innerHTML = "";
 
   const div = document.createElement("div");
-  div.className = "alert alert-" + type;
+  div.className = "alert alert--" + type;
   div.textContent = text;
 
   box.appendChild(div);
@@ -22,9 +22,6 @@ function show(type, text) {
 
 async function finishLogin(user) {
   await user.reload();
-
-  console.log("Logged in user:", user);
-  console.log("Email verified:", user.emailVerified);
 
   if (!user.emailVerified) {
     await signOut(auth);
@@ -37,13 +34,11 @@ async function finishLogin(user) {
     return;
   }
 
-  window.location.href = "index.html";
+  window.location.href = "dashboard.html";
 }
 
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  console.log("LOGIN FORM SUBMITTED");
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;

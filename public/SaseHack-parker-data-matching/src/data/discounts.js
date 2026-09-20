@@ -1,5 +1,5 @@
 /*
- * SEED STARTER DATASET — student discounts.
+ * SEED STARTER DATASET, student discounts.
  *
  * HONESTY / SAFETY (from the plan):
  *   - Every row is a REAL program at a REAL company with a real source_url.

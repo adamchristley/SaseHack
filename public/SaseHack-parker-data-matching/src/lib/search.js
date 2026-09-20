@@ -1,5 +1,5 @@
 /*
- * Discount search — fuzzy, typo-tolerant, alias-aware.
+ * Discount search, fuzzy, typo-tolerant, alias-aware.
  *
  * The plan uses Postgres pg_trgm similarity. In a client-side app the direct
  * equivalent is Fuse.js: fuzzy scoring across a brand's name AND its aliases,

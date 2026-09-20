@@ -38,7 +38,7 @@
     </nav>
 
     <a class="header-login" href="login.html">Log in</a>
-    <a class="btn btn-invert btn-sm header-cta" href="dashboard.html">Start</a>
+    <a class="btn btn-invert btn-sm header-cta" href="index.html">Start</a>
     </header>
         
     <main>
@@ -191,12 +191,19 @@
     </div>
 
     <script src="scroll.js" defer></script>
-    <!--<script type="module">
-        import { auth } from "./firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-        onAuthStateChanged(auth, (user) => {
-            window.location = user && user.emailVerified ? "dashboard.html" : "login.html";
-        });
-    </script>-->
+<script type="module">
+  import { auth } from "./firebase-config.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    
+    if (!user || !user.emailVerified) return;
+
+    const link = document.querySelector(".header-login");
+    link.textContent = "Hi, " + (user.displayName || user.email);
+    link.href = "index.html";
+    link.title = "Open my dashboard";
+  });
+</script>
     </body>
 </html>

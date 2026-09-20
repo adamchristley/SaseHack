@@ -3,33 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-    <title>Registration Form</title>
+    <title>Register — Charge Up Savings</title>
+    <link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
-    <div class="container">
-        <div id="message"></div>
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">⚡</span>
+            <span>Charge&nbsp;Up Savings</span>
+        </a>
+    </header>
 
-        <form id="register-form">
-            <div class="form-group">
-                <input type="text" id="fullname" class="form-control" placeholder="Full name:" required>
-            </div>
-            <div class="form-group">
-                <input type="email" id="email" class="form-control" placeholder="Email:" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="password" class="form-control" placeholder="Password:" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="repeat" class="form-control" placeholder="Repeat Password:" required>
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Register">
-            </div>
-        </form>
-        <div><p>Already registered? <a href="login.html">Login</a></p></div>
-    </div>
+    <main class="authwrap">
+        <div class="authcard">
+            <h1 class="h1">Create an account</h1>
+            <p class="lead">Find the money you're already entitled to.</p>
+
+            <div id="message"></div>
+
+            <form id="register-form">
+                <div class="field">
+                    <label class="field-label" for="fullname">Full name</label>
+                    <input type="text" id="fullname" placeholder="Jane Doe" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@school.edu" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="password">Password</label>
+                    <input type="password" id="password" placeholder="At least 8 characters" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="repeat">Repeat password</label>
+                    <input type="password" id="repeat" placeholder="••••••••" required>
+                </div>
+                <label class="consent" for="store-data">
+                    <input type="checkbox" id="store-data">
+                    <span>
+                        <strong>Save my profile and email me my top scholarship matches</strong>
+                        <small>Stored in your account. You can change this any time on your account page. Turning it off deletes your saved data.</small>
+                    </span>
+                </label>
+                <button type="submit" class="btn btn--gold">Register</button>
+            </form>
+
+            <p class="linkrow">Already registered? <a href="login.html">Log in</a></p>
+        </div>
+    </main>
 
     <script type="module" src="register.js"></script>
 </body>

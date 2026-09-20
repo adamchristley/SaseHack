@@ -1,5 +1,5 @@
 /*
- * Scholarship matching engine — DETERMINISTIC. No LLM, ever.
+ * Scholarship matching engine, DETERMINISTIC. No LLM, ever.
  *
  * The plan's hard rule: "The LLM extracts. The database matches. Never the
  * other way round." Every match here comes from a real seed row with a real
@@ -11,8 +11,8 @@
  * the profile fails.
  *
  * Two passes:
- *   1. hardFilter  — drop rows the student is ineligible for
- *   2. scoreMatch  — rank what survives, and record WHY it matched
+ *   1. hardFilter, drop rows the student is ineligible for
+ *   2. scoreMatch, rank what survives, and record WHY it matched
  */
 
 // ---- small helpers -------------------------------------------------------
@@ -35,48 +35,102 @@ function daysUntil(dateStr, today = new Date()) {
   return Math.round(ms / 86400000)
 }
 
-// ---- pass 1: hard filters ------------------------------------------------
+// ---- pass 1: eligibility assessment -------------------------------------
 
 /**
- * Returns true if the student is ELIGIBLE (row survives).
- * A missing profile field can't fail a requirement (we don't know), so we
- * only exclude when both the requirement AND the relevant profile fact exist.
+ * Eligibility is tri-state:
+ *   eligible    all known requirements are satisfied
+ *   needs_info  no conflict, but the profile is missing required information
+ *   ineligible  at least one explicit requirement conflicts
+ *
+ * Missing demographic / affiliation information must never be treated as a
+ * positive match. This prevents scholarships for women, disability, veteran,
+ * ethnicity, etc. from being presented as confirmed matches when the resume
+ * says nothing about those criteria.
  */
-export function isEligible(scholarship, profile, today = new Date()) {
+export function assessEligibility(scholarship, profile, today = new Date()) {
   const s = scholarship
   const p = profile || {}
+  const unknown = []
+  const conflicts = []
 
-  // Scam rule: legitimate awards never charge an application fee.
-  if (s.requires_fee === true) return false
+  if (s.requires_fee === true) conflicts.push('application fee')
 
-  // Major: excluded only if the row restricts majors and none overlap.
-  if (list(s.majors).length && overlap(s.majors, p.majors).length === 0) return false
+  if (list(s.majors).length) {
+    if (!list(p.majors).length) unknown.push('major')
+    else if (overlap(s.majors, p.majors).length === 0) conflicts.push('major')
+  }
 
-  // GPA: excluded if a minimum is set and the (known) GPA is below it.
-  if (s.min_gpa != null && p.gpa != null && Number(p.gpa) < Number(s.min_gpa)) return false
+  if (s.min_gpa != null) {
+    if (p.gpa == null) unknown.push('GPA')
+    else if (Number(p.gpa) < Number(s.min_gpa)) conflicts.push('GPA')
+  }
 
-  // Year level: excluded if restricted and the (known) year isn't included.
-  if (list(s.year_levels).length && p.year_level &&
-      !list(s.year_levels).map(norm).includes(norm(p.year_level))) return false
+  if (list(s.year_levels).length) {
+    if (!p.year_level) unknown.push('year level')
+    else if (!list(s.year_levels).map(norm).includes(norm(p.year_level))) conflicts.push('year level')
+  }
 
-  // State: excluded if restricted and the (known) state isn't included.
-  if (list(s.states).length && p.state &&
-      !list(s.states).map(norm).includes(norm(p.state))) return false
+  if (list(s.states).length) {
+    if (!p.state) unknown.push('residency state')
+    else if (!list(s.states).map(norm).includes(norm(p.state))) conflicts.push('residency state')
+  }
 
-  // Citizenship: excluded only on a stated mismatch.
-  if (s.citizenship && p.citizenship && norm(s.citizenship) !== norm(p.citizenship)) return false
+  if (s.citizenship) {
+    if (!p.citizenship) {
+      unknown.push(citizenshipLabel(s.citizenship))
+    } else if (!citizenshipMatches(s.citizenship, p.citizenship)) {
+      conflicts.push(citizenshipLabel(s.citizenship))
+    }
+  }
 
-  // Deadline: a past, non-recurring deadline is dead.
+  if (s.min_age != null || s.max_age != null) {
+    if (p.age == null) {
+      unknown.push(ageLabel(s.min_age, s.max_age))
+    } else {
+      if (s.min_age != null && Number(p.age) < Number(s.min_age)) conflicts.push(ageLabel(s.min_age, s.max_age))
+      if (s.max_age != null && Number(p.age) > Number(s.max_age)) conflicts.push(ageLabel(s.min_age, s.max_age))
+    }
+  }
+
+  if (s.graduate_plan) {
+    if (!p.graduate_plan) {
+      unknown.push(graduatePlanLabel(s.graduate_plan))
+    } else if (!graduatePlanMatches(s.graduate_plan, p.graduate_plan)) {
+      conflicts.push(graduatePlanLabel(s.graduate_plan))
+    }
+  }
+
+  for (const requirement of list(s.manual_requirements)) {
+    unknown.push(requirement)
+  }
+
+  if (list(s.affiliations).length && overlap(s.affiliations, p.affiliations).length === 0) {
+    unknown.push('eligibility group / affiliation')
+  }
+
   const d = daysUntil(s.deadline, today)
-  if (d != null && d < 0 && !s.recurring) return false
+  if (d != null && d < 0 && !s.recurring) conflicts.push('deadline passed')
 
-  return true
+  return {
+    status: conflicts.length ? 'ineligible' : unknown.length ? 'needs_info' : 'eligible',
+    unknown: [...new Set(unknown)],
+    conflicts: [...new Set(conflicts)],
+  }
+}
+
+/**
+ * Backward-compatible boolean used by existing tests and callers. A scholarship
+ * survives unless a known fact proves the student ineligible.
+ */
+export function isEligible(scholarship, profile, today = new Date()) {
+  return assessEligibility(scholarship, profile, today).status !== 'ineligible'
 }
 
 // ---- pass 2: scoring + reasons ------------------------------------------
 
 const WEIGHTS = {
-  affiliation: 3.0,   // strongest signal — this is who the award is FOR
+  affiliation: 3.0,   // strongest signal, this is who the award is FOR
   major: 2.5,
   keyword: 1.5,       // each, capped
   urgency: 1.0,       // deadline within 60 days
@@ -86,7 +140,7 @@ const KEYWORD_CAP = 3 // count at most 3 keyword hits toward score
 
 /**
  * Score one eligible scholarship and build human-readable reasons.
- * Reasons come ONLY from which filters/signals fired — never from a model.
+ * Reasons come ONLY from which filters/signals fired, never from a model.
  */
 export function scoreMatch(scholarship, profile, today = new Date()) {
   const s = scholarship
@@ -94,7 +148,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
   let score = 0
   const reasons = []
 
-  // Affiliation — the highest-value signal.
+  // Affiliation, the highest-value signal.
   const affHits = overlap(s.affiliations, p.affiliations)
   if (affHits.length) {
     score += WEIGHTS.affiliation * Math.min(affHits.length, 2)
@@ -119,7 +173,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
     reasons.push(`Matches what you do: ${kwHits.slice(0, 3).join(', ')}`)
   }
 
-  // Year level — note eligibility as a reason even when unrestricted.
+  // Year level, note eligibility as a reason even when unrestricted.
   if (list(s.year_levels).length && p.year_level) {
     reasons.push(`Open to ${norm(p.year_level)}s`)
   } else if (list(s.year_levels).length === 0) {
@@ -133,7 +187,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
     reasons.push(d === 0 ? 'Deadline is today' : `Deadline in ${d} day${d === 1 ? '' : 's'}`)
   }
 
-  // Award size — mild log-scaled nudge so bigger awards float up on ties.
+  // Award size, mild log-scaled nudge so bigger awards float up on ties.
   const amount = Number(s.amount_max || s.amount_min || 0)
   if (amount > 0) {
     const scaled = Math.min(Math.log10(amount + 1) / Math.log10(50001), 1)
@@ -154,9 +208,14 @@ export function matchScholarships(scholarships, profile, { limit = 20, today = n
     .filter((s) => isEligible(s, profile, today))
     .map((s) => {
       const { score, reasons } = scoreMatch(s, profile, today)
-      return { scholarship: s, score, reasons }
+      const eligibility = assessEligibility(s, profile, today)
+      return { scholarship: s, score, reasons, eligibility }
     })
-    .sort((a, b) => b.score - a.score || deadlineTie(a, b))
+    .sort((a, b) => {
+      const statusRank = { eligible: 0, needs_info: 1, ineligible: 2 }
+      const byStatus = statusRank[a.eligibility.status] - statusRank[b.eligibility.status]
+      return byStatus || b.score - a.score || deadlineTie(a, b)
+    })
     .slice(0, limit)
 }
 
@@ -171,3 +230,38 @@ function deadlineTie(a, b) {
 
 function round2(n) { return Math.round(n * 100) / 100 }
 function titleCase(s) { return String(s).replace(/\b\w/g, (c) => c.toUpperCase()) }
+
+
+function citizenshipMatches(requirement, value) {
+  const actual = norm(value)
+  if (requirement === 'US_CITIZEN' || requirement === 'US') return actual === 'us_citizen'
+  if (requirement === 'US_OR_PR') {
+    return ['us_citizen', 'us_national', 'permanent_resident'].includes(actual)
+  }
+  return norm(requirement) === actual
+}
+
+function citizenshipLabel(requirement) {
+  if (requirement === 'US_CITIZEN' || requirement === 'US') return 'U.S. citizenship'
+  if (requirement === 'US_OR_PR') return 'U.S. citizen/national/permanent resident'
+  return 'citizenship'
+}
+
+function ageLabel(min, max) {
+  if (min != null && max != null) return `age ${min}–${max}`
+  if (min != null) return `age ${min}+`
+  return `age ${max} or younger`
+}
+
+function graduatePlanMatches(requirement, value) {
+  if (requirement === 'research_grad') {
+    return ['research_grad', 'phd'].includes(norm(value))
+  }
+  return norm(requirement) === norm(value)
+}
+
+function graduatePlanLabel(requirement) {
+  if (requirement === 'phd') return 'plans to pursue an eligible full-time PhD'
+  if (requirement === 'research_grad') return 'plans research-based STEM graduate study'
+  return 'graduate study plans'
+}
