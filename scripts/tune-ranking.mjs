@@ -1,5 +1,9 @@
 import { GoogleGenAI } from '@google/genai'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import scholarships from '../src/data/scholarships.js'
+import rankingBenchmark from '../src/data/rankingBenchmark.js'
 import { assessEligibility, scoreMatch } from '../src/lib/matching.js'
 import {
   bm25Rank,
@@ -13,68 +17,10 @@ const TOP_K = 5
 const ITERATIONS = 14
 const CANDIDATES_PER_ITERATION = 250
 
-const benchmark = [
-  {
-    name: 'CS + SASE junior',
-    profile: {
-      majors: ['computer science'],
-      year_level: 'junior',
-      gpa: 3.6,
-      state: 'MI',
-      school: 'Michigan Technological University',
-      affiliations: ['SASE'],
-      skills: ['python', 'software engineering'],
-      interests: ['machine learning', 'systems programming'],
-      work_experience: ['software engineering intern'],
-    },
-    relevant: new Set([1, 3, 11, 12]),
-  },
-  {
-    name: 'manufacturing-focused mechanical engineer',
-    profile: {
-      majors: ['mechanical engineering'],
-      year_level: 'junior',
-      gpa: 3.4,
-      state: 'MI',
-      school: 'Michigan Technological University',
-      affiliations: [],
-      skills: ['cad', 'manufacturing'],
-      interests: ['manufacturing', 'automotive engineering'],
-      work_experience: ['engineering intern'],
-    },
-    relevant: new Set([17, 18]),
-  },
-  {
-    name: 'chemistry research sophomore',
-    profile: {
-      majors: ['chemistry'],
-      year_level: 'sophomore',
-      gpa: 3.8,
-      state: 'MI',
-      school: 'Michigan Technological University',
-      affiliations: [],
-      skills: ['research'],
-      interests: ['chemistry', 'laboratory research'],
-      work_experience: ['research assistant'],
-    },
-    relevant: new Set([10, 11]),
-  },
-  {
-    name: 'graduating STEM researcher',
-    profile: {
-      majors: ['physics'],
-      year_level: 'senior',
-      gpa: 3.9,
-      state: 'MI',
-      school: 'Michigan Technological University',
-      affiliations: [],
-      skills: ['research', 'python'],
-      interests: ['applied physics', 'research'],
-      work_experience: ['undergraduate researcher'],
-    },
-    relevant: new Set([19, 20]),
-  },
-]
+const benchmark = rankingBenchmark
+
+loadLocalEnv()
+
 
 if (!process.env.GEMINI_API_KEY) {
   console.error('Set GEMINI_API_KEY before running npm run tune:ranking.')
@@ -143,6 +89,8 @@ for (let i = 1; i < y.length; i += 1) {
 }
 
 const best = X[bestIndex]
+const baseline = objective([0.55, 0.30, 0.15])
+console.log(`\nBaseline nDCG@${TOP_K}: ${baseline.toFixed(4)}`)
 console.log('\nBest Bayesian-optimized ranking weights')
 console.log(`nDCG@${TOP_K}: ${y[bestIndex].toFixed(4)}`)
 console.log(`rules:    ${best[0].toFixed(4)}`)
@@ -224,23 +172,29 @@ function objective(weights) {
       }))
       .sort((a, b) => b.score - a.score)
 
-    total += ndcgAtK(ranked.map((row) => row.id), item.relevant, TOP_K)
+    total += ndcgAtK(ranked.map((row) => row.id), item.relevance, TOP_K)
   }
 
   return total / cases.length
 }
 
-function ndcgAtK(ids, relevant, k) {
+function ndcgAtK(ids, relevance, k) {
   let dcg = 0
   for (let i = 0; i < Math.min(k, ids.length); i += 1) {
-    const gain = relevant.has(ids[i]) ? 1 : 0
+    const grade = Number(relevance[ids[i]] || 0)
+    const gain = (2 ** grade) - 1
     dcg += gain / Math.log2(i + 2)
   }
 
-  const idealHits = Math.min(k, relevant.size)
+  const idealGrades = Object.values(relevance)
+    .map(Number)
+    .sort((a, b) => b - a)
+    .slice(0, k)
+
   let idcg = 0
-  for (let i = 0; i < idealHits; i += 1) {
-    idcg += 1 / Math.log2(i + 2)
+  for (let i = 0; i < idealGrades.length; i += 1) {
+    const gain = (2 ** idealGrades[i]) - 1
+    idcg += gain / Math.log2(i + 2)
   }
 
   return idcg ? dcg / idcg : 0
@@ -382,4 +336,29 @@ function clamp(value, min, max) {
 
 function format(weights) {
   return `[${weights.map((x) => x.toFixed(3)).join(', ')}]`
+}
+
+
+function loadLocalEnv() {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
+  const envPath = path.resolve(__dirname, '..', '.env.local')
+  if (!fs.existsSync(envPath)) return
+
+  const text = fs.readFileSync(envPath, 'utf8')
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim()
+    if (!line || line.startsWith('#')) continue
+    const equals = line.indexOf('=')
+    if (equals <= 0) continue
+
+    const key = line.slice(0, equals).trim()
+    let value = line.slice(equals + 1).trim()
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1)
+    }
+    if (!(key in process.env)) process.env[key] = value
+  }
 }
