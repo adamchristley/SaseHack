@@ -144,7 +144,7 @@ export default function Scholarships() {
           ) : (
             <>
               {topFive.length > 0 && (
-                <p className="result-label">Confirmed from known information · {topFive.length}</p>
+                <p className="result-label">Strong matches · {topFive.length}</p>
               )}
               {topFive.length > 0 && (
                 <div className="card-grid">
@@ -167,7 +167,7 @@ export default function Scholarships() {
 
               {needsInfo.length > 0 && (
                 <details className="more potential-matches">
-                  <summary>{needsInfo.length} potentially relevant scholarship{needsInfo.length === 1 ? '' : 's'} need more eligibility information</summary>
+                  <summary>{needsInfo.length} potential match{needsInfo.length === 1 ? '' : 'es'} need verification</summary>
                   <p className="potential-note">
                     These are not confirmed matches. The resume does not provide one or more required facts, so we keep them separate instead of assuming eligibility.
                   </p>
@@ -186,6 +186,11 @@ export default function Scholarships() {
                     <span>Lexical retrieval</span><strong>{advanced.meta.lexical_method}</strong>
                     <span>Rank fusion</span><strong>{advanced.meta.fusion_method}</strong>
                     <span>Semantic model</span><strong>{advanced.meta.semantic_model || 'local fallback'}</strong>
+                    {advanced.meta.semantic_cache && (
+                      <>
+                        <span>Scholarship embedding cache</span><strong>{advanced.meta.semantic_cache}</strong>
+                      </>
+                    )}
                     {advanced.meta.semantic_error && (
                       <>
                         <span>Semantic fallback reason</span><strong>{advanced.meta.semantic_error}</strong>
