@@ -77,8 +77,32 @@ export function assessEligibility(scholarship, profile, today = new Date()) {
   }
 
   if (s.citizenship) {
-    if (!p.citizenship) unknown.push('citizenship')
-    else if (norm(s.citizenship) !== norm(p.citizenship)) conflicts.push('citizenship')
+    if (!p.citizenship) {
+      unknown.push(citizenshipLabel(s.citizenship))
+    } else if (!citizenshipMatches(s.citizenship, p.citizenship)) {
+      conflicts.push(citizenshipLabel(s.citizenship))
+    }
+  }
+
+  if (s.min_age != null || s.max_age != null) {
+    if (p.age == null) {
+      unknown.push(ageLabel(s.min_age, s.max_age))
+    } else {
+      if (s.min_age != null && Number(p.age) < Number(s.min_age)) conflicts.push(ageLabel(s.min_age, s.max_age))
+      if (s.max_age != null && Number(p.age) > Number(s.max_age)) conflicts.push(ageLabel(s.min_age, s.max_age))
+    }
+  }
+
+  if (s.graduate_plan) {
+    if (!p.graduate_plan) {
+      unknown.push(graduatePlanLabel(s.graduate_plan))
+    } else if (!graduatePlanMatches(s.graduate_plan, p.graduate_plan)) {
+      conflicts.push(graduatePlanLabel(s.graduate_plan))
+    }
+  }
+
+  for (const requirement of list(s.manual_requirements)) {
+    unknown.push(requirement)
   }
 
   if (list(s.affiliations).length && overlap(s.affiliations, p.affiliations).length === 0) {
@@ -206,3 +230,38 @@ function deadlineTie(a, b) {
 
 function round2(n) { return Math.round(n * 100) / 100 }
 function titleCase(s) { return String(s).replace(/\b\w/g, (c) => c.toUpperCase()) }
+
+
+function citizenshipMatches(requirement, value) {
+  const actual = norm(value)
+  if (requirement === 'US_CITIZEN') return actual === 'us_citizen'
+  if (requirement === 'US_OR_PR') {
+    return ['us_citizen', 'us_national', 'permanent_resident'].includes(actual)
+  }
+  return norm(requirement) === actual
+}
+
+function citizenshipLabel(requirement) {
+  if (requirement === 'US_CITIZEN') return 'U.S. citizenship'
+  if (requirement === 'US_OR_PR') return 'U.S. citizen/national/permanent resident'
+  return 'citizenship'
+}
+
+function ageLabel(min, max) {
+  if (min != null && max != null) return `age ${min}–${max}`
+  if (min != null) return `age ${min}+`
+  return `age ${max} or younger`
+}
+
+function graduatePlanMatches(requirement, value) {
+  if (requirement === 'research_grad') {
+    return ['research_grad', 'phd'].includes(norm(value))
+  }
+  return norm(requirement) === norm(value)
+}
+
+function graduatePlanLabel(requirement) {
+  if (requirement === 'phd') return 'plans to pursue an eligible full-time PhD'
+  if (requirement === 'research_grad') return 'plans research-based STEM graduate study'
+  return 'graduate study plans'
+}
