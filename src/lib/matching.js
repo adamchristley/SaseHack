@@ -1,5 +1,5 @@
 /*
- * Scholarship matching engine — DETERMINISTIC. No LLM, ever.
+ * Scholarship matching engine, DETERMINISTIC. No LLM, ever.
  *
  * The plan's hard rule: "The LLM extracts. The database matches. Never the
  * other way round." Every match here comes from a real seed row with a real
@@ -11,8 +11,8 @@
  * the profile fails.
  *
  * Two passes:
- *   1. hardFilter  — drop rows the student is ineligible for
- *   2. scoreMatch  — rank what survives, and record WHY it matched
+ *   1. hardFilter, drop rows the student is ineligible for
+ *   2. scoreMatch, rank what survives, and record WHY it matched
  */
 
 // ---- small helpers -------------------------------------------------------
@@ -76,7 +76,7 @@ export function isEligible(scholarship, profile, today = new Date()) {
 // ---- pass 2: scoring + reasons ------------------------------------------
 
 const WEIGHTS = {
-  affiliation: 3.0,   // strongest signal — this is who the award is FOR
+  affiliation: 3.0,   // strongest signal, this is who the award is FOR
   major: 2.5,
   keyword: 1.5,       // each, capped
   urgency: 1.0,       // deadline within 60 days
@@ -86,7 +86,7 @@ const KEYWORD_CAP = 3 // count at most 3 keyword hits toward score
 
 /**
  * Score one eligible scholarship and build human-readable reasons.
- * Reasons come ONLY from which filters/signals fired — never from a model.
+ * Reasons come ONLY from which filters/signals fired, never from a model.
  */
 export function scoreMatch(scholarship, profile, today = new Date()) {
   const s = scholarship
@@ -94,7 +94,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
   let score = 0
   const reasons = []
 
-  // Affiliation — the highest-value signal.
+  // Affiliation, the highest-value signal.
   const affHits = overlap(s.affiliations, p.affiliations)
   if (affHits.length) {
     score += WEIGHTS.affiliation * Math.min(affHits.length, 2)
@@ -119,7 +119,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
     reasons.push(`Matches what you do: ${kwHits.slice(0, 3).join(', ')}`)
   }
 
-  // Year level — note eligibility as a reason even when unrestricted.
+  // Year level, note eligibility as a reason even when unrestricted.
   if (list(s.year_levels).length && p.year_level) {
     reasons.push(`Open to ${norm(p.year_level)}s`)
   } else if (list(s.year_levels).length === 0) {
@@ -133,7 +133,7 @@ export function scoreMatch(scholarship, profile, today = new Date()) {
     reasons.push(d === 0 ? 'Deadline is today' : `Deadline in ${d} day${d === 1 ? '' : 's'}`)
   }
 
-  // Award size — mild log-scaled nudge so bigger awards float up on ties.
+  // Award size, mild log-scaled nudge so bigger awards float up on ties.
   const amount = Number(s.amount_max || s.amount_min || 0)
   if (amount > 0) {
     const scaled = Math.min(Math.log10(amount + 1) / Math.log10(50001), 1)

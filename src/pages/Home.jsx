@@ -16,7 +16,7 @@ export default function Home({ onGo }) {
         <p className="lead">
           Students lose money to <em>not knowing</em>, not to overspending. This finds
           the student discounts hiding at companies you already pay for, and the
-          scholarships you're actually eligible for — each one with a real source and
+          scholarships you're actually eligible for, each one with a real source and
           a date we last checked it.
         </p>
         <div className="cta-row">
@@ -34,14 +34,14 @@ export default function Home({ onGo }) {
           onClick={() => onGo('discounts')}
           kicker="Discount finder"
           title="Does a company you pay for have a student discount?"
-          body="Type the brand — Spotify, Adobe, Amazon. Get a yes/no, how to claim it, and when we last verified the offer. Typo-tolerant: “chipotel” still finds it."
+          body="Type the brand, like Spotify, Adobe, or Amazon. Get a yes/no, how to claim it, and when we last verified the offer. Typo tolerant, so “chipotel” still finds it."
           stat={`${brandCount} brands`}
         />
         <FeatureCard
           onClick={() => onGo('scholarships')}
           kicker="Scholarship matcher"
           title="Which scholarships are you actually eligible for?"
-          body="Fill a quick profile (or paste one from a resume). We filter by real eligibility rules and rank matches — each one shows exactly why it matched."
+          body="Fill a quick profile (or paste one from a resume). We filter by real eligibility rules and rank matches, and each one shows exactly why it matched."
           stat={`${schCount} scholarships`}
         />
       </div>
@@ -49,7 +49,7 @@ export default function Home({ onGo }) {
       <div className="why-strip">
         <Why title="Freshness is the feature">
           Every result carries a <strong>last-verified date</strong> and a link to the
-          source. Dead links are why other lists are useless — we check ours.
+          source. Dead links are why other lists are useless, so we check ours.
         </Why>
         <Why title="Explainable matching">
           Scholarship matches are ranked by <strong>deterministic rules</strong>, not a

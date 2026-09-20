@@ -2,7 +2,7 @@
 //
 // In the full app the extractor teammate fills this from a resume via
 // POST /api/resume. Parker's matcher doesn't care where the profile came
-// from — so this panel doubles as (a) the plan's "editable profile" that turns
+// from, so this panel doubles as (a) the plan's "editable profile" that turns
 // an extraction error into a two-second fix, and (b) the survey fallback for
 // users with no resume. The field names ARE the frozen contract.
 
@@ -25,8 +25,8 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
         </div>
       </div>
       <p className="panel-hint">
-        Extraction gets things wrong — edit anything and matches re-rank instantly.
-        Nothing here is stored.
+        Extraction gets things wrong, so edit anything and matches re-rank
+        instantly. Nothing here is stored.
       </p>
 
       <div className="form-grid">
@@ -40,7 +40,7 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
 
         <Field label="Year level">
           <select value={profile.year_level || ''} onChange={(e) => set({ year_level: e.target.value || null })}>
-            <option value="">—</option>
+            <option value="">Any</option>
             {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         </Field>

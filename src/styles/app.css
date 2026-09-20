@@ -1,12 +1,15 @@
 /* ---- base ---------------------------------------------------------------- */
 * { box-sizing: border-box; }
-html, body, #root { height: 100%; }
+html { height: 100%; }
+body, #root { min-height: 100%; }
 body {
   margin: 0;
   font-family: var(--font);
-  background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(255, 203, 5, 0.10), transparent 60%),
-    var(--bg);
+  background-color: var(--bg);
+  /* Single gold glow, pinned to the viewport so it never tiles or moves on scroll. */
+  background-image: radial-gradient(1200px 600px at 80% -10%, rgba(255, 203, 5, 0.10), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
@@ -14,7 +17,7 @@ body {
 a { color: var(--mtu-gold); }
 button { font-family: inherit; cursor: pointer; }
 
-/* Visible focus everywhere — accessibility is a scored criterion. */
+/* Visible focus everywhere, accessibility is a scored criterion. */
 :focus-visible {
   outline: 3px solid var(--mtu-gold);
   outline-offset: 2px;
@@ -58,7 +61,7 @@ button { font-family: inherit; cursor: pointer; }
 .wrap.narrow { max-width: 640px; }
 
 .h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
-.lead { color: var(--text-dim); font-size: 17px; max-width: 68ch; margin: 0; }
+.lead { color: var(--text); font-size: 17px; max-width: 68ch; margin: 0; }
 .eyebrow { color: var(--mtu-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; margin: 0 0 12px; }
 .accent { color: var(--mtu-gold); }
 .section-head { margin-bottom: 24px; }
@@ -90,14 +93,14 @@ button { font-family: inherit; cursor: pointer; }
 .feature-top { display: flex; align-items: center; justify-content: space-between; }
 .feature-kicker { color: var(--mtu-gold); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
 .feature-title { font-size: 21px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-.feature-body { color: var(--text-dim); margin: 0; font-size: 15px; }
+.feature-body { color: var(--text); margin: 0; font-size: 15px; }
 .feature-go { color: var(--mtu-gold); font-weight: 700; margin-top: auto; }
 .pill { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
 
 .why-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
 .why { border-left: 3px solid var(--mtu-gold); padding: 4px 0 4px 16px; }
 .why-title { font-size: 15px; font-weight: 800; margin: 0 0 4px; }
-.why-body { color: var(--text-dim); font-size: 14px; margin: 0; }
+.why-body { color: #cdd2dc; font-size: 14px; margin: 0; }
 
 /* ---- search -------------------------------------------------------------- */
 .searchbar {

@@ -4,7 +4,7 @@ import Discounts from './pages/Discounts.jsx'
 import Scholarships from './pages/Scholarships.jsx'
 
 // Four tabs in the plan. Parker owns Discounts + Scholarships; Home is a light
-// landing that routes into both. Login is the auth teammate's tab — stubbed
+// landing that routes into both. Login is the auth teammate's tab, stubbed
 // here so the shell is complete and nothing is gated behind it.
 const TABS = [
   { id: 'home', label: 'Home' },
@@ -47,7 +47,7 @@ export default function App() {
       <footer className="footer">
         <span>SASEhack 2026 · Michigan Tech</span>
         <span className="footer-dim">
-          Built for first-gen &amp; low-income students — money you're already entitled to.
+          Built for first-gen and low-income students. Money you're already entitled to.
         </span>
       </footer>
     </div>

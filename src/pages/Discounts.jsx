@@ -33,7 +33,7 @@ export default function Discounts() {
         <h1 className="h1">Student discounts</h1>
         <p className="lead">
           Type a company you already pay for. We only count savings on things you
-          actually use — no inflated totals.
+          actually use, no inflated totals.
         </p>
       </div>
 
@@ -76,7 +76,7 @@ export default function Discounts() {
       )}
 
       {!searching && (
-        <p className="result-label">Featured — recognisable brands worth knowing about</p>
+        <p className="result-label">Featured brands worth knowing about</p>
       )}
       {searching && list.length > 0 && (
         <p className="result-label">{list.length} match{list.length === 1 ? '' : 'es'} for “{query.trim()}”</p>
@@ -123,7 +123,7 @@ function EmptyState({ query }) {
         </>
       ) : (
         <p className="empty-body empty-ok">
-          ✓ Logged. Thanks — this is exactly the demand signal that decides what we add next.
+          ✓ Logged. Thanks. This is exactly the demand signal that decides what we add next.
         </p>
       )}
     </div>

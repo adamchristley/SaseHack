@@ -1,5 +1,5 @@
 // One ranked scholarship match. The reasons are the highest-value detail:
-// explainable matching, generated from which filters/signals fired — never
+// explainable matching, generated from which filters/signals fired, never
 // from an LLM. Every card links to the official source (scam-safety rule).
 
 export default function ScholarshipCard({ match, rank }) {
@@ -42,8 +42,8 @@ export default function ScholarshipCard({ match, rank }) {
 
 function formatAmount(s) {
   const min = s.amount_min, max = s.amount_max
-  if (!min && !max) return '—'
-  if (min && max && min !== max) return `$${k(min)}–$${k(max)}`
+  if (!min && !max) return 'Varies'
+  if (min && max && min !== max) return `$${k(min)} to $${k(max)}`
   return `$${k(max || min)}`
 }
 function k(n) { return Number(n).toLocaleString('en-US') }

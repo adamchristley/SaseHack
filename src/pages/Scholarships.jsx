@@ -10,7 +10,7 @@ const EMPTY_PROFILE = {
 }
 
 // A realistic profile to make the demo one click. Mirrors the plan's example
-// StudentProfile JSON — the kind of thing the extractor would produce.
+// StudentProfile JSON, the kind of thing the extractor would produce.
 const SAMPLE_PROFILE = {
   majors: ['computer science'],
   year_level: 'junior',
@@ -40,8 +40,8 @@ export default function Scholarships() {
         <h1 className="h1">Scholarship matcher</h1>
         <p className="lead">
           We filter {scholarships.length} real scholarships by eligibility rules, then
-          rank what's left — and show you exactly why each one matched. The database
-          matches; no model ever invents an award.
+          rank what's left, and show you exactly why each one matched. The database
+          matches, and no model ever invents an award.
         </p>
       </div>
 
@@ -64,7 +64,7 @@ export default function Scholarships() {
               <p className="empty-title">No matches for this profile yet.</p>
               <p className="empty-body">
                 Every scholarship here stated a requirement your profile doesn't meet.
-                Try broadening a major or adjusting your year level — or add more rows to the dataset.
+                Try broadening a major or adjusting your year level, or add more rows to the dataset.
               </p>
             </div>
           ) : (
