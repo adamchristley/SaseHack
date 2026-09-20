@@ -8,6 +8,7 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
   let semantic = []
   let semanticAvailable = false
   let semanticModel = null
+  let semanticCache = null
   let semanticError = null
 
   try {
@@ -15,6 +16,7 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
     semantic = result.scores
     semanticAvailable = true
     semanticModel = result.model
+    semanticCache = result.document_cache || null
   } catch (error) {
     semanticError = error instanceof Error ? error.message : 'Semantic retrieval unavailable'
   }
@@ -109,6 +111,7 @@ export async function advancedScholarshipMatches(scholarships, profile, { limit 
     meta: {
       mode: semanticAvailable ? 'hybrid' : 'hybrid-local',
       semantic_model: semanticModel,
+      semantic_cache: semanticCache,
       semantic_error: semanticError,
       lexical_method: 'BM25',
       fusion_method: 'Reciprocal Rank Fusion',
