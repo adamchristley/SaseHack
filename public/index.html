@@ -1,17 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading</title>
-</head>
-<body>
-    <script type="module">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Unclaimed</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
+
+        <link rel="stylesheet" href="styles/header.css">
+        <link rel="stylesheet" href="styles/home.css">
+        <link rel="stylesheet" href="styles/button.css">
+        <link rel="stylesheet" href="styles/motion.css">
+        <link rel="stylesheet" href="styles/card.css">
+        <link rel="stylesheet" href="styles/end.css">
+
+    </head>
+
+    <body>
+    <!--Header-->
+    <header class="site-header">
+
+        <a class="brand" href="index.html">       
+                <img class="icon"
+                src="images/icon.png">
+                <span class="unclaimed"> Unclaimed</span>
+        </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    
+    <nav class="site-nav" id="primary-nav" style="justify-content: flex-end">
+        <a href="index.html" aria-current="page"> Home</a>
+        <a href="#how"> How it works</a>
+        <a href="#sources">Where the money is</a>
+        <a href="#goal">Our goal</a>
+    </nav>
+
+    <a class="header-login" href="login.html">Log in</a>
+    <a class="btn btn-invert btn-sm header-cta" href="dashboard.html">Start</a>
+    </header>
+        
+    <main>
+    <!--------beginning---------->
+          <section class="begin">
+            <img class="begin-back" src="images/hampter.jpg" alt="" aria-hidden="true">
+            <div class="begin-scrim"></div>
+
+            <div class="wrap begin-inner">
+                <div class="reveal">
+                    <span class="pill-live">Live for Michigan Technological Univserity</span>
+                    <h1>The money nobody tells you about.</h1>
+                    <p class="begin-lede">Students are eligible for money they never claim, because it is buried in documents nobody reads. Upload your resume and we will show you what you may be missing out on!</p>
+                    <div class="begin-actions">
+                        <a class="btn btn-primary btn-lg" href="dashboard.html">Find my number</a>
+                        <a class="btn btn-onDark btn-lg" href="#how">See how it works</a>
+                    </div>
+                    <p class="begin-note"> Free of cost, takes about a minute,and every figure links to the page it came from.</p>
+                </div>
+
+                <div class="number-card reveal" data-delay="2">
+                    <span class="eyebrow">We found</span>
+                    <div class="total money" data-countup="19784" data-prefix="$">$19,784</div>
+                    <hr>
+                    <div class="split-row">
+                        <span class="swatch swatch-green"></span>
+                        <span class="label">Claimable today</span>
+                        <span class="amount">$1,284</span>
+                    </div>
+                    <div class="split-row">
+                        <span class="swatch swatch-grey"></span>
+                        <span class="label">Eligible to apply for</span>
+                        <span class="amount">$18,500</span>
+                    </div>
+                    <div class="deadline-note">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        3 close within 12 days
+                    </div>
+                </div>
+            </div>
+          </section> 
+
+          <!-------Stats------->
+          <div class="wrap">
+            <section class="stat-strip reveal">
+                <div><div class="value">340</div><div class="label">awards indexed at your school</div></div>
+                <div><div class="value">112</div><div class="label">local discounts verified in person</div></div>
+                <div><div class="value">$847</div><div class="label">average in fees prepaying unised services</div></div>
+            </section>
+          </div>
+
+    <!-------How it works-------->
+        <section class="section" id="how">
+            <div class="wrap">
+                <p class="eyebrow reveal">How it works</p>
+                <h2 class="display reveal" style="font-size:clamp(26px,3.2vw,40px); margin:14px 0 54px">Three steps, and a few minutes</h2>
+
+                <div class="steps">
+                    <div class="steps-grid">
+                        <div class="step reveal" data-delay="0">
+                            <div class="num">01</div>
+                            <div class="dot"></div>
+                            <h3>Upload your resume</h3>
+                            <p>We read your major, year, coursework and experience. It only takes a couple minutes and you can delete it whenever you like!</p>
+                        </div>
+                        <div class="step reveal" data-delay="1">
+                            <div class="num">02</div>
+                            <div class="dot"></div>
+                            <h3>Answer eight questions</h3>
+                            <p>Residency, first-generation, whether you are on a parent's insurance. The things that decide eligibility adn never appear on a resume.</p>
+                        </div>
+                        <div class="step reveal" data-delay="2">
+                            <div class="num">03</div>
+                            <div class="dot"></div>
+                            <h3>See your number</h3>
+                            <p>Every match, sorted by deadline, with the reason it matched and a link to the page it came from. Check things off as you claim them.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!---------Sources--------->
+        <section class="section-tight" id="sources" style="padding-bottom: 80px">
+            <div class="wrap">
+                <p class="eyebrow reveal">Where the money is</p>
+                <h2 class="display reveal" style="font-size:clamp(26px, 3.2vw, 40px); margin: 14px 0 10px">Where the money actually is</h2>
+                <p class="lede reveal" style="max-width: 620px; margin-bottom:44px">Three sources, none of them a national database of scholarships you will never win.</p>
+
+                <div class="source-grid">
+                    <article class="card source-card reveal" data-delay="0">
+                        <div class="rule"></div>
+                        <div class="amount">$500<span class="muted">&ndash;</span>6,000</div>
+                        <h3>Awards at your own school</h3>
+                        <p>Departmental and endowed scolarships buried on a page nobody visits. Some of them had two applicants last year.</p>
+                    </article>
+
+                    <article class="card-dark source-card reveal" data-delay="1">
+                        <div class="rule"></div>
+                        <div class="amount">$300<span class="muted">&ndash;</span>900<small> a year</small></div>
+                        <h3>Discounts around campus</h3>
+                        <p>The pool, barber, bus pass, mueseums. Find student discounts that could save you hundreds.</p>
+                    </article>
+
+                    <article class="card source-card reveal" data-delay="2">
+                        <div class="rule"></div>
+                        <div class="amount">$847<span class="muted">&ndash;</span> a term</div>
+                        <h3>Fees you already paid</h3>
+                        <p>Your mandatory fees prepay for software, counsolling, print credits and insurance you may have never knew.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+    <!----------Our goal---------->
+        <section id="goal" style="padding-bottom:84px">
+            <div class="wrap">
+                <div class="goal reveal">
+                    <p class="eyebrow" style="margin-bottom:22px">Our goal</p>
+                    <h2>Our goal is to make every dollar a student qualifies for visible in one place, before the deadline passes.</h2>
+                    <div class="goal-cols">
+                        <p>None of this money is hidden on purpose. Universities publish their awards, bursars publish their fee schedules, and the businesses around campus run student rates. It is all public. It is spread across forty pages nobody has time to read, written in language nobody teaches you.</p>
+                        <p>So we do not create money and we do not guess. We index what your campus already publishes, match it against who you actually are, and show you the source for every figure on the screen. If we cannot link to where a number came from, we do not show it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!----------Closing--------->
+    <section class="closing reveal-scale">
+        <div class="wrap">
+            <h2>Find out what you are owed.</h2>
+            <p>It costs nothing, it takes about ninety seconds, and you can delete everything afterwards.</p>
+            <a class="btn btn-invert btn-lg" href="dashboard.html">Upload my resume</a>
+        </div>
+    </section>
+    </main>
+
+    <!---------footer---------->
+    <div class="wrap">
+        <footer class="site-footer">
+            <span class="mark">Unclaimed</span>
+            <span>A student project. Not affiliated with any university.</span>
+            <nav>
+                <a href="#privacy">Privacy</a>
+                <a href="#sources">Sources</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </footer>
+    </div>
+
+    <script src="scroll.js" defer></script>
+    <!--<script type="module">
         import { auth } from "./firebase-config.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         onAuthStateChanged(auth, (user) => {
             window.location = user && user.emailVerified ? "dashboard.html" : "login.html";
         });
-    </script>
-</body>
+    </script>-->
+    </body>
 </html>
