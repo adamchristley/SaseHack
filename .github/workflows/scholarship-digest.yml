@@ -50,6 +50,9 @@ jobs:
           node-version: 20
       - run: npm install
 
+      - name: Sync scholarship data from the app source
+        run: npm run sync
+
       - name: Send digests
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
