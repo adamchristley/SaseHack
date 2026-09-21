@@ -1,6 +1,9 @@
 node_modules
 **/node_modules
+# Build scratch. The only build output we commit is public/tool (see INTEGRATION.md).
 app/dist
+/dist
+/.vite
 .env
 .env.local
 *.log
