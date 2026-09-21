@@ -1,34 +1,21 @@
 :root {
-  /* surfaces */
-  --ink:       #191814;
-  --paper:     #FBFAF6;
-  --line:      #E4E0D6;
-  --muted:     #191814;
-  --muted-dim: #FBFAF6;
-
-  /* on dark */
-  --ink-fg:   #C9C5B8;
-  --ink-line: #FBFAF6;
-
-  /* accent */
-  --accent:    #ffd93d;
-  --accent-bg: #EBF2ED;
-
-  --warn:    #8F3F17;
-  --warn-bg: #FBEFE7;
-
+  --ink:#191814; --paper:#FBFAF6;
+  --line:#E4E0D6; --muted:#191814; --muted-dim:#FBFAF6;
+  --ink-fg:#C9C5B8; --ink-line:#FBFAF6;
+  --accent:#ffd93d; --accent-bg:#EBF2ED; 
+  --warn:#8F3F17; --warn-bg:#FBEFE7;
   --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-mono:  'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
+  --text-xs:0.75rem;
+  --text-sm:0.875rem;
+  --text-base:1rem;
 
-  --header-h: 64px;
-  --pitch-w:  480px;
-  --radius:   12px;
-  --radius-lg: 14px;
-  --pill:     999px;
+  --header-h:64px;
+  --pitch-w:480px;
+  --radius:12px;
+  --radius-lg:14px;
+  --pill:999px;
 }
 
 .split {
@@ -37,7 +24,7 @@
   min-height: calc(100vh - var(--header-h));
 }
 
-.pitch-panel,
+.pitch-panel, 
 .form-panel {
   display: flex;
   flex-direction: column;
@@ -47,15 +34,15 @@
 .pitch-panel { background: var(--ink); color: var(--paper); }
 .form-panel  { padding-inline: 64px; }
 
-.pitch-panel h1,
+.pitch-panel h1, 
 .form-panel h2 {
   font-family: var(--font-serif);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
-.pitch-panel h1 { font-size: clamp(2.125rem, 3.6vw, 3.25rem); }
-.form-panel h2  { font-size: clamp(1.75rem, 3vw, 2.25rem); }
+.pitch-panel h1 {font-size: clamp(2.125rem, 3.6vw, 3.25rem);}
+.form-panel h2  {font-size: clamp(1.75rem, 3vw, 2.25rem);}
 
 .pitch-panel p {
   margin-top: 24px;
@@ -157,7 +144,7 @@
     background: var(--accent-bg);
   }
 
-  .title { font-size: var(--text-base); font-weight: 600; color:#ffd93d }
+  .title { font-size: var(--text-base); font-weight: 600; color:#ffd93d}
 
   .hint {
     margin-top: 8px;
@@ -168,7 +155,7 @@
   }
 }
 
-.parsed { margin-top: 24px; }
+.parsed { margin-top: 24px;}
 
 .parsed-head {
   display: flex;
