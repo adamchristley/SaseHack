@@ -31,7 +31,6 @@ const SAMPLE_PROFILE = {
 export default function Scholarships() {
   const [profile, setProfile] = useState(EMPTY_PROFILE)
   const [advanced, setAdvanced] = useState(null)
-  const [rankingStatus, setRankingStatus] = useState('idle')
 
   const fallbackMatches = useMemo(
     () => matchScholarships(scholarships, profile, { limit: 8 }),
@@ -49,20 +48,16 @@ export default function Scholarships() {
 
     setAdvanced(null)
     if (!hasProfile) {
-      setRankingStatus('idle')
       return () => {}
     }
-
-    setRankingStatus('loading')
     timer = setTimeout(async () => {
       try {
         const result = await advancedScholarshipMatches(scholarships, profile, { limit: 8 })
         if (!cancelled) {
           setAdvanced(result)
-          setRankingStatus(result.meta.mode)
         }
       } catch {
-        if (!cancelled) setRankingStatus('rules')
+        // The deterministic fallback remains available through fallbackMatches.
       }
     }, 350)
 
@@ -79,22 +74,14 @@ export default function Scholarships() {
   const topFive = matches.slice(0, 5)
   const rest = matches.slice(5)
 
-  const rankingLabel = rankingStatus === 'hybrid'
-    ? 'Hybrid ranking: BM25 + Gemini embeddings + RRF + eligibility rules'
-    : rankingStatus === 'hybrid-local'
-      ? 'Local hybrid ranking: BM25 + eligibility rules'
-      : rankingStatus === 'loading'
-        ? 'Building hybrid retrieval ranking...'
-        : 'Deterministic eligibility ranking'
-
   return (
     <section className="wrap">
       <div className="section-head">
         <h1 className="h1">Scholarship matcher</h1>
         <p className="lead">
-          We retrieve relevant scholarships, enforce explicit eligibility rules,
-          then rank what remains and show exactly why each result surfaced.
-          The model extracts profile facts, but it never invents an award or decides eligibility.
+          Upload your resume to find scholarships that fit your background.
+          We show what matches, what still needs verification, and link every result
+          to its official source.
         </p>
       </div>
 
@@ -114,13 +101,6 @@ export default function Scholarships() {
         </div>
 
         <div className="sch-results">
-          {hasProfile && (
-            <div className="ranking-status" role="status">
-              <span className={'ranking-dot ranking-dot--' + (rankingStatus === 'hybrid' ? 'live' : 'local')} />
-              {rankingLabel}
-            </div>
-          )}
-
           {hasProfile && (
             <AdaptiveQuestions
               needsInfo={needsInfo}
@@ -179,29 +159,6 @@ export default function Scholarships() {
                 </details>
               )}
 
-              {advanced?.meta && (
-                <details className="retrieval-meta">
-                  <summary>Technical retrieval details</summary>
-                  <div className="retrieval-meta-grid">
-                    <span>Lexical retrieval</span><strong>{advanced.meta.lexical_method}</strong>
-                    <span>Rank fusion</span><strong>{advanced.meta.fusion_method}</strong>
-                    <span>Semantic model</span><strong>{advanced.meta.semantic_model || 'local fallback'}</strong>
-                    {advanced.meta.semantic_cache && (
-                      <>
-                        <span>Scholarship embedding cache</span><strong>{advanced.meta.semantic_cache}</strong>
-                      </>
-                    )}
-                    {advanced.meta.semantic_error && (
-                      <>
-                        <span>Semantic fallback reason</span><strong>{advanced.meta.semantic_error}</strong>
-                      </>
-                    )}
-                    <span>Rule weight</span><strong>{advanced.meta.weights.rules}</strong>
-                    <span>Fusion weight</span><strong>{advanced.meta.weights.rrf}</strong>
-                    <span>Semantic weight</span><strong>{advanced.meta.weights.semantic}</strong>
-                  </div>
-                </details>
-              )}
             </>
           )}
         </div>
