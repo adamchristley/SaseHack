@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Upload Resume</title>
+        <meta name="description" content="Upload your resume and find out how much money is waiting for you.">
+        <link rel="icon" href="images/icon.png" type="image/png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
+
+        <link rel="stylesheet" href="styles/header.css">
+        <link rel="stylesheet" href="styles/home.css">
+        <link rel="stylesheet" href="styles/button.css">
+        <link rel="stylesheet" href="styles/motion.css">
+        <link rel="stylesheet" href="styles/card.css">
+        <link rel="stylesheet" href="styles/upload.css">
+        <link rel="stylesheet" href="styles/end.css">
+    </head>
+
+    <body>
+        <header class="site-header">
+            <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">⚡</span>
+            <span>Charge&nbsp;Up Savings</span>
+        </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    
+            <nav class="site-nav" id="primary-nav" style="justify-content: flex-end">
+                <a href="index.html" aria-current="page"> Home</a>
+                <a href="index.html#how"> How it works</a>
+                <a href="index.html#sources">Where the money is</a>
+                <a href="index.html#goal">Our goal</a>
+            </nav>
+
+            <a class="header-login" href="login.html">Log in</a>
+            <a class="btn btn-invert btn-sm header-cta" href="upload.html">Start</a>
+        </header>
+
+        <main class="split">
+            <!----- Left Column ---------->
+            <aside class="pitch-panel">
+                <div class="grow" style = "display: flex; flex-direction: column; justify-content:center">
+                    <h1>Upload Your Resume And Get Results</h1>
+                    <p>Your university publishes hundreds of opportunities, your fees prepay for services you probably have never used, and get insightful feedback on your resume.</p>
+                    <p>None of it is advertised. Upload a resume and we will tell you the number.</p>
+                </div>
+                <div class="pitch-stats">
+                    <div><div class="value"> 340</div><div class="label">Awards indexed</div></div>
+                    <div><div class="value"> 112</div><div class="label">Local discounts verified</div></div>
+                </div>
+            </aside>
+
+            <!----- Right Column ---------->
+            <section class="form-panel">
+                <ol class="stepper">
+                    <li class="step-tag" data-state="on"><span class="bullet">1</span> Resume</li>
+                    <li class="bar" aria-hidden="true"></li>
+                    <li class="step-tag"><span class="bullet">2</span> Eight Questions</li>
+                    <li class="bar" aria-hidden="true"></li>
+                    <li class="step-tag"><span class="bullet">3</span> Your Number</li>
+                </ol>
+
+                <h2>Start with your resume</h2>
+                <p class="muted" style="margin:10px 0 28px; max-width: 480px"> We read your major, year, coursework and experience from it. Nothing is shared with anyone, and you can delete it any time.</p>
+
+                <form>
+                    <label class="dropzone" for="resume-file">
+                        <span class="icon">
+                            <svg width="22" height ="22" viewBox="0 0 24 24" fill="none" stroke="#1B5B4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 16V4"/><path d="M7 9l5-5 5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>
+                        </span>
+                        <span class="title"> Drop your resume here</span>
+                        <span class="hint">PDF or Word, up to 10MB - or <span>browse your files</span></span>
+                    </label>
+                    <input class="sr-only" id="resume-file" type="file" accept=".pdf,.doc,.docx">
+
+                    <div class="card parsed" hidden>
+                        <div class="parsed-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B6B4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                            <span class="name">resume.pdf</span>
+                            <span class="muted" style="font-size:13px">reading information...</span>
+                            <button class="linkish" type="button" style="margin-left:auto">Replace</button>
+                        </div>
+                        <div class="chip-row">
+                            <span class="chip">Computer Science</span>
+                            <span class="chip">Class of 2023</span>
+                            <span class="chip">Junior</span>
+                            <span class="chip">Research assistant</span>
+                            <span class="chip">JavaScript</span>
+                            <span class="chip chip-warn">GPA not found</span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="gap:16px; margin-top:32px; flex-wrap:wrap; padding-bottom: 24px;">
+                        <a class="btn btn-primary btn-lg" href="dashboard.html">Continue to the questions</a>
+                        <a class="muted" href="dashboard.html" style ="font-size:14px; padding-left: 16px;">I do not have a resume</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <script src="scroll.js" defer></script>
+    </body>
+</html>

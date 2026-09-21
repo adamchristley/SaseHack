@@ -64,3 +64,4 @@ button{font-family:inherit; cursor:pointer}
 .consent input{width:18px; height:18px; margin-top:2px; flex:none; accent-color:var(--mtu-gold); cursor:pointer}
 .consent strong{display:block; font-size:14px; color:var(--text); font-weight:700}
 .consent small{display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px}
+.consent small{display:block; font-size:12.5px; color:var(--text-dim); margin-top:2px}
