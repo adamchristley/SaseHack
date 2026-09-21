@@ -1,15 +1,10 @@
-// Pure helpers for the scholarship digest: who is due, which matches to send, what the email says.
-// No network and no Firebase in here, so it can be unit-tested (digest-lib.test.js).
+
 import { matchScholarships } from './matching.js'
 
 export const MAX_ITEMS = 5
 
-// Where the "manage your emails" link goes (the app's page, Account tab).
 export const APP_PATH = '/dashboard.html'
 
-// ---- who is due ------------------------------------------------------------
-
-// Firestore hands back Timestamp objects; accept those, Dates, and plain numbers.
 export function toMillis(value) {
   if (value == null) return null
   if (typeof value === 'number') return value
@@ -19,10 +14,8 @@ export function toMillis(value) {
   return null
 }
 
-const CLOCK_SLACK_MS = 15000 // runner clock vs Google's clock can differ by a few seconds
+const CLOCK_SLACK_MS = 15000
 
-// True if this user hasn't been emailed within the last `minMinutes` minutes.
-// minMinutes = 0 means "always send" (handy for testing).
 export function isDue(lastSent, now = Date.now(), minMinutes = 10080) {
   if (!(minMinutes > 0)) return true
   const last = toMillis(lastSent)
@@ -30,22 +23,16 @@ export function isDue(lastSent, now = Date.now(), minMinutes = 10080) {
   return now - last >= minMinutes * 60000 - CLOCK_SLACK_MS
 }
 
-// ---- what to send ----------------------------------------------------------
-
-// Confirmed matches only. Rows that still "need info" are left out so we never
-// tell someone they may qualify for something we couldn't actually check.
 export function pickMatches(scholarships, profile, { limit = MAX_ITEMS, today = new Date() } = {}) {
   return matchScholarships(scholarships, profile, { limit: 1000, today })
     .filter((m) => !m.eligibility || m.eligibility.status === 'eligible')
     .slice(0, limit)
 }
 
-// ---- formatting ------------------------------------------------------------
-
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
 export const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ESCAPES[c])
 
-// Only http(s) links go into the email.
+
 const safeUrl = (url) => (/^https?:\/\//i.test(String(url || '')) ? String(url) : '')
 
 const dollars = (n) => '$' + Number(n).toLocaleString('en-US')
@@ -70,7 +57,6 @@ export function formatDeadline(s, today = new Date()) {
   return `Due ${nice}`
 }
 
-// "junior · computer science · GPA 3.6 · MI": shows in the email which saved profile it was built from.
 export function profileSummary(profile) {
   const p = profile || {}
   const bits = []
