@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
-const appSrc = path.resolve(here, '../public/SaseHack-parker-data-matching/src')
+const appSrc = path.resolve(here, '../app/src')
 const files = [
   ['data/scholarships.js', 'scholarships.js'],
   ['lib/matching.js', 'matching.js'],

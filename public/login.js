@@ -34,7 +34,7 @@ async function finishLogin(user) {
     return;
   }
 
-  window.location.href = "dashboard.html";
+  window.location.href = "/tool/#scholarships";
 }
 
 document.getElementById("login-form").addEventListener("submit", async (e) => {
