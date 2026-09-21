@@ -29,9 +29,10 @@ npm run build    # production build to dist/
 | Discount search | `src/lib/search.js` | Fuzzy, typo-tolerant, alias-aware (Fuse.js ≈ pg_trgm). "chipotel" → Chipotle. |
 | Scholarship matcher | `src/lib/matching.js` | **Deterministic.** Hard filters, then scoring, with a reason for every match. No LLM. |
 | Seed data | `src/data/discounts.js`, `src/data/scholarships.js` | Real programs, real source URLs. See caveat below. |
+| Live national DB | `api/scholarships.js`, `api/_careeronestop.js` | Serverless proxy to CareerOneStop. Merged with the curated 50. See below. |
 | UI | `src/pages/`, `src/components/` | Home / Discounts / Scholarships + a Login stub for the auth teammate. |
 | Palette | `src/styles/tokens.css` | MTU black & gold as CSS variables, one edit to retheme. |
-| Tests | `tests/matching.test.js`, `tests/search.test.js` | The cases the plan asked for. |
+| Tests | `tests/matching.test.js`, `tests/search.test.js`, `tests/careeronestop.test.js` | The cases the plan asked for, plus the normaliser. |
 
 ## The two things that make this more than a directory
 
@@ -43,15 +44,47 @@ npm run build    # production build to dist/
 
 ## ⚠️ Data is a STARTER set, verify before the pitch
 
-Per the plan's hard rule, **nothing here is invented**, every row is a real
-program with a real `source_url` you can open. But this is ~28 discounts and 50
-scholarships (plan targets are 120+ / 50+), and the `verified_at`, `deadline`,
-and dollar amounts are **placeholders**. Building/running the verifier (walk
-every `source_url`, confirm the offer still exists, stamp the real date) and
-expanding the dataset is the deliverable. Adding a row = one hand-filled object.
+Per the plan's hard rule, **nothing here is invented**, every curated row is a
+real program with a real `source_url` you can open. The curated set is ~60
+discounts and 50 scholarships; the scholarship matcher also pulls the live
+national database on top of that (see below). The curated `verified_at`,
+`deadline`, and dollar amounts are **placeholders**, so verify them against each
+`source_url` before the pitch. Adding a curated row = one hand-filled object.
 
 **Never** let a model generate data rows, and **never** scrape UNiDAYS / Student
 Beans / aggregators.
+
+## Live national scholarship database
+
+The matcher runs against the curated 50 **plus** the live national database
+(U.S. Department of Labor CareerOneStop). When you fill in a profile, the app
+queries a keyword (your major/interest) live, merges the results with the
+curated 50 (deduped by name, curated wins), and runs the same deterministic
+matcher over everything.
+
+A live call can't happen straight from the browser: the API token must stay
+server-side, and the API blocks direct browser calls (CORS). So there is one
+small serverless proxy, `api/scholarships.js`, that holds the token and calls
+CareerOneStop. It runs as a Vercel/Netlify function in production and is mounted
+into the Vite dev server locally (see `vite.config.js`), so the same code path
+works in `npm run dev`. If the API is slow or down, the app falls back to the
+curated 50, so a live demo never dies.
+
+```bash
+# one-time: get a free token at
+# https://www.careeronestop.org/Developers/WebAPI/registration.aspx
+cp .env.example .env            # then fill in the two values
+# or set them in your host's env (Vercel/Netlify dashboard)
+CAREERONESTOP_USERID=your-user-id
+CAREERONESTOP_TOKEN=your-api-token
+npm run dev                     # /api/scholarships is served locally
+```
+
+Confirm the field mapping once against a live response with
+`/api/scholarships?q=engineering&debug=1` (returns a raw sample record).
+`normalize()` in `api/_careeronestop.js` is the one place tied to the API's
+field names. The proxy forces `requires_fee: false` and drops fee-mentioning
+rows, so the scam rule holds for live data too.
 
 ## Safety rules baked in
 

@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
-import scholarships from '../data/scholarships.js'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import curated from '../data/scholarships.js'
 import { matchScholarships } from '../lib/matching.js'
+import { mergeByName } from '../lib/mergeScholarships.js'
+import { searchNational } from '../lib/scholarshipApi.js'
 import ProfilePanel from '../components/ProfilePanel.jsx'
 import ScholarshipCard from '../components/ScholarshipCard.jsx'
 
@@ -23,13 +25,47 @@ const SAMPLE_PROFILE = {
   work_experience: ['IT help desk'],
 }
 
+// Keyword we send to the national database, derived from the profile.
+function queryFromProfile(p) {
+  return (p.majors[0] || p.interests[0] || p.skills[0] || '').trim()
+}
+
 export default function Scholarships() {
   const [profile, setProfile] = useState(EMPTY_PROFILE)
+  const [national, setNational] = useState([])
+  const [api, setApi] = useState({ state: 'idle', fetchedAt: null, error: null }) // idle|loading|ok|error
+  const abortRef = useRef(null)
 
-  // Re-match on every profile edit. Deterministic + tiny dataset = instant.
-  const matches = useMemo(() => matchScholarships(scholarships, profile, { limit: 8 }), [profile])
+  const query = queryFromProfile(profile)
   const hasProfile = profile.majors.length || profile.affiliations.length ||
     profile.skills.length || profile.year_level || profile.gpa != null
+
+  // Live-query the national database when the derived keyword changes.
+  // Debounced, abortable, and it never blocks the curated results.
+  useEffect(() => {
+    if (!query) { setNational([]); setApi({ state: 'idle', fetchedAt: null, error: null }); return }
+
+    const t = setTimeout(async () => {
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+      setApi((a) => ({ ...a, state: 'loading', error: null }))
+      try {
+        const data = await searchNational(query, { signal: controller.signal })
+        setNational(data.scholarships)
+        setApi({ state: 'ok', fetchedAt: data.fetched_at, error: null })
+      } catch (err) {
+        if (controller.signal.aborted) return // superseded by a newer query
+        setNational([]) // fall back to curated only
+        setApi({ state: 'error', fetchedAt: null, error: String(err.message || err) })
+      }
+    }, 400)
+
+    return () => clearTimeout(t)
+  }, [query])
+
+  const combined = useMemo(() => mergeByName(curated, national), [national])
+  const matches = useMemo(() => matchScholarships(combined, profile, { limit: 12 }), [combined, profile])
 
   const topFive = matches.slice(0, 5)
   const rest = matches.slice(5)
@@ -39,10 +75,11 @@ export default function Scholarships() {
       <div className="section-head">
         <h1 className="h1">Scholarship matcher</h1>
         <p className="lead">
-          We filter {scholarships.length} real scholarships by eligibility rules, then
-          rank what's left, and show you exactly why each one matched. The database
-          matches, and no model ever invents an award.
+          We filter your matches against {curated.length} curated scholarships plus
+          the live national database, rank what's left, and show you exactly why
+          each one matched. The database matches, and no model ever invents an award.
         </p>
+        <p className="data-note">{sourceLabel(api, national.length)}</p>
       </div>
 
       <div className="sch-layout">
@@ -63,8 +100,8 @@ export default function Scholarships() {
             <div className="empty">
               <p className="empty-title">No matches for this profile yet.</p>
               <p className="empty-body">
-                Every scholarship here stated a requirement your profile doesn't meet.
-                Try broadening a major or adjusting your year level, or add more rows to the dataset.
+                Every scholarship checked stated a requirement your profile doesn't meet.
+                Try broadening a major or adjusting your year level.
               </p>
             </div>
           ) : (
@@ -91,4 +128,11 @@ export default function Scholarships() {
       </div>
     </section>
   )
+}
+
+function sourceLabel(api, nationalCount) {
+  if (api.state === 'loading') return 'Searching the national database…'
+  if (api.state === 'ok') return `Live: ${nationalCount} national result${nationalCount === 1 ? '' : 's'} added${api.fetchedAt ? `, as of ${api.fetchedAt}` : ''}.`
+  if (api.state === 'error') return 'National database unavailable right now, showing the curated set.'
+  return 'Curated set. Add a major or interest to pull live national results.'
 }

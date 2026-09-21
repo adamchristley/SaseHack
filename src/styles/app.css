@@ -65,6 +65,7 @@ button { font-family: inherit; cursor: pointer; }
 .eyebrow { color: var(--mtu-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; margin: 0 0 12px; }
 .accent { color: var(--mtu-gold); }
 .section-head { margin-bottom: 24px; }
+.data-note { color: var(--text-faint); font-size: 13px; margin: 8px 0 0; }
 
 /* ---- home ---------------------------------------------------------------- */
 .hero { padding: clamp(16px, 4vw, 40px) 0 clamp(28px, 4vw, 48px); }
@@ -86,6 +87,7 @@ button { font-family: inherit; cursor: pointer; }
 .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
 .feature-card {
   text-align: left; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); /* button elements default to black text; force white so titles are readable */
   border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 10px;
   transition: border-color 0.15s ease, transform 0.1s ease;
 }
