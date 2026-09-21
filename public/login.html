@@ -1,63 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Log in</title>
-        <link rel="icon" href="images/icon.png" type="image/png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
-
-        <link rel="stylesheet" href="styles/header.css">
-        <link rel="stylesheet" href="styles/home.css">
-        <link rel="stylesheet" href="styles/button.css">
-        <link rel="stylesheet" href="styles/auth.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in — Charge Up Savings</title>
+    <link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">⚡</span>
+            <span>Charge&nbsp;Up Savings</span>
+        </a>
+    </header>
 
-<header class="site-header">
-    <a class="brand" href="index.html">
-        <img class="icon" src="images/icon.png" alt="">
-        <span class="unclaimed"> Unclaimed</span>
-    </a>
-</header>
-
-<main class="auth">
-    <div class="auth-shell">
-        <div class="auth-card">
-            <h1 style="padding-bottom: 16px;">Login</h1>
-            
+    <main class="authwrap">
+        <div class="authcard">
+            <h1 class="h1">Log in</h1>
+            <p class="lead">Find the money you're already entitled to.</p>
 
             <div id="message"></div>
 
-            <form id="login-form" novalidate>
+            <form id="login-form">
                 <div class="field">
-                    <label for="email">Email address</label>
-                    <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+                    <label class="field-label" for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@school.edu" required>
                 </div>
-
                 <div class="field">
-                    <div class="field-head">
-                        <label for="password">Password</label>
-                    </div>
-                    <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+                    <label class="field-label" for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
                 </div>
-
-                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 16px;">Log in</button>
+                <button type="submit" class="btn btn--gold">Log in</button>
             </form>
 
             <div class="divider">or</div>
 
-            <button id="google-btn" type="button" class="btn btn-secondary btn-block">Continue with Google</button>
+            <button id="google-btn" type="button" class="btn btn--ghost">Sign in with Google</button>
 
-            <p class="auth-note">You will need to have verified your email before you can log in.</p>
+            <p class="linkrow"><a href="#" id="forgot-link">Forgot your password?</a></p>
+            <p class="linkrow">Not registered yet? <a href="register.html">Register here</a></p>
         </div>
+    </main>
 
-        <p class="auth-foot">Not registered yet? <a href="register.html">Create an account</a></p>
-    </div>
-</main>
-
-<script type="module" src="login.js"></script>
+    <script type="module" src="login.js"></script>
 </body>
 </html>

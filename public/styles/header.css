@@ -11,10 +11,17 @@
     padding-inline: 32px;
 }
 
+.brand{display:flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-size:18px; font-weight:800; letter-spacing:-.01em}
+.brand-mark{display:grid; place-items:center; width:30px; height:30px; background:var(--mtu-gold); color:var(--mtu-black); border-radius:8px; font-size:16px}
+
 .brand {
     display: flex; 
     align-items: center;  
     flex-shrink: 0;
+}
+.topbar{
+  display:flex; align-items:center; gap:10px;
+  padding:16px clamp(16px,4vw,32px); border-bottom:1px solid var(--border);
 }
 .brand:hover { color:inherit}
 

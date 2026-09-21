@@ -3,15 +3,15 @@
   --ink:       #191814;
   --paper:     #FBFAF6;
   --line:      #E4E0D6;
-  --muted:     #57544B;
-  --muted-dim: #8E887E;
+  --muted:     #191814;
+  --muted-dim: #FBFAF6;
 
   /* on dark */
   --ink-fg:   #C9C5B8;
-  --ink-line: #333029;
+  --ink-line: #FBFAF6;
 
   /* accent */
-  --accent:    #1B6B4A;
+  --accent:    #ffd93d;
   --accent-bg: #EBF2ED;
 
   --warn:    #8F3F17;
@@ -94,7 +94,7 @@
     align-items: center;
     gap: 8px;
     font-size: var(--text-sm);
-    color: var(--muted);
+    color: #FBFAF6;
   }
 
   .bullet {
@@ -111,13 +111,13 @@
   }
 
   .step-tag[data-state="on"] {
-    color: var(--ink);
+    color: #ffd93d;
     font-weight: 600;
 
     .bullet {
       background: var(--accent);
       border-color: var(--accent);
-      color: var(--paper);
+      color: var(--ink);
     }
   }
 
@@ -157,7 +157,7 @@
     background: var(--accent-bg);
   }
 
-  .title { font-size: var(--text-base); font-weight: 600; }
+  .title { font-size: var(--text-base); font-weight: 600; color:#ffd93d }
 
   .hint {
     margin-top: 8px;

@@ -24,8 +24,8 @@
     padding: 24px;
 }
 
-.card-dark {background: #1e2128; border-color: #2b2f38; color: #f4f5f7;}
-.card-dark p {color: #a7adba;}
+.card-dark {background: #ffcb05; border-color: #ffcb05; color: #16181d;}
+.card-dark p {color: #16181d;}
 
 .stat-strip {
     display: grid;

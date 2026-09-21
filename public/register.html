@@ -1,67 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Register</title>
-        <link rel="icon" href="images/icon.png" type="image/png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
-
-        <link rel="stylesheet" href="styles/header.css">
-        <link rel="stylesheet" href="styles/home.css">
-        <link rel="stylesheet" href="styles/button.css">
-        <link rel="stylesheet" href="styles/auth.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Charge Up Savings</title>
+    <link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">⚡</span>
+            <span>Charge&nbsp;Up Savings</span>
+        </a>
+    </header>
 
-<header class="site-header">
-    <a class="brand" href="index.html">
-        <img class="icon" src="images/icon.png" alt="">
-        <span class="unclaimed"> Unclaimed</span>
-    </a>
-</header>
+    <main class="authwrap">
+        <div class="authcard">
+            <h1 class="h1">Create an account</h1>
+            <p class="lead">Find the money you're already entitled to.</p>
 
-<main class="auth">
-<div class="auth-shell">
-    <div class="auth-card">
-        <h1>Create an account</h1>
-    
-        <div id="message"></div>
+            <div id="message"></div>
 
-        <form id="register-form" novalidate>
-            <div class="field">
-                <label for="fullname">Full name</label>
-                <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Adam Parker" required>
-            </div>
+            <form id="register-form">
+                <div class="field">
+                    <label class="field-label" for="fullname">Full name</label>
+                    <input type="text" id="fullname" placeholder="Jane Doe" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@school.edu" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="password">Password</label>
+                    <input type="password" id="password" placeholder="At least 8 characters" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="repeat">Repeat password</label>
+                    <input type="password" id="repeat" placeholder="••••••••" required>
+                </div>
+                <label class="consent" for="store-data">
+                    <input type="checkbox" id="store-data">
+                    <span>
+                        <strong>Save my profile and email me my top scholarship matches</strong>
+                        <small>Stored in your account. You can change this any time on your account page. Turning it off deletes your saved data.</small>
+                    </span>
+                </label>
+                <button type="submit" class="btn btn--gold">Register</button>
+            </form>
 
-            <div class="field">
-                <label for="email">Email address</label>
-                <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
-            </div>
+            <p class="linkrow">Already registered? <a href="login.html">Log in</a></p>
+        </div>
+    </main>
 
-            <div class="field">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
-            </div>
-
-            <div class="field">
-                <label for="repeat">Repeat password</label>
-                <input type="password" id="repeat" name="repeat" autocomplete="new-password" placeholder="••••••••" minlength="6" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Create account</button>
-        </form>
-
-        <p class="auth-note">Find new opportunities and get what you deserve.</p>
-        <p class="auth-note" style="margin-top: 3px;"> Prefer Google? Use <a href="login.html">Continue with Google</a> on the login page and it makes your account on first use.</p>
-    </div>
-
-    <p class="auth-foot">Already registered? <a href="login.html">Log in</a></p>
-</div>
-</main>
-
-<script type="module" src="register.js"></script>
+    <script type="module" src="register.js"></script>
 </body>
 </html>
