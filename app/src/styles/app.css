@@ -41,10 +41,10 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 18px; font-weight: 800; letter-spacing: -0.01em; padding: 4px;
 }
 .brand-mark {
-  display: grid; place-items: center; width: 30px; height: 30px;
-  background: var(--mtu-gold); color: var(--mtu-black);
-  border-radius: 8px; font-size: 16px;
+  display: block; width: 30px; height: 30px;
+  border-radius: 8px; object-fit: cover;
 }
+
 .tabs { display: flex; gap: 4px; }
 .tab {
   background: none; border: 0; color: var(--text-dim);
@@ -176,7 +176,9 @@ button { font-family: inherit; cursor: pointer; }
 .sch-layout { display: grid; grid-template-columns: 360px 1fr; gap: 22px; align-items: start; }
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .muted-panel { color: var(--text-dim); }
-.sch-sidebar { display: grid; gap: 14px; position: sticky; top: 76px; }\n.profile-panel { position: static; }
+.sch-sidebar { display: grid; gap: 14px; position: sticky; top: 76px; min-width: 0; }
+.sch-sidebar > * { min-width: 0; }
+.profile-panel { position: static; }
 .panel-head { display: flex; align-items: center; justify-content: space-between; }
 .panel-title { font-size: 18px; font-weight: 800; margin: 0; }
 .panel-actions { display: flex; gap: 6px; }

@@ -1,0 +1,200 @@
+/* Marketing-style Home tab, ported from the old public/index.html + its
+   styles/{home,card,motion,end,button}.css. Everything is scoped under
+   .home-marketing so it can't leak into the Discounts/Scholarships/Account
+   tabs, which already define their own .btn/.card/.chip classes. */
+
+.home-marketing {
+  background: #0c0d10;
+  color: #f4f5f7;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  margin: calc(-1 * var(--space-lg, 24px)) calc(-1 * var(--space-lg, 24px)) 0;
+}
+
+.home-marketing h1, .home-marketing h2, .home-marketing h3, .home-marketing h4 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.home-marketing p { margin: 0; }
+.home-marketing a { color: #ffcb05; text-decoration: none; }
+.home-marketing a:hover { color: #ffd93d; }
+.home-marketing button { font: inherit; cursor: pointer; }
+.home-marketing img, .home-marketing svg { display: block; max-width: 100%; }
+
+.home-marketing .wrap { max-width: 1200px; margin-inline: auto; padding-inline: 24px; }
+.home-marketing .eyebrow {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: #a7adba;
+}
+.home-marketing .display {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-weight: 400; letter-spacing: -0.02em;
+}
+.home-marketing .lede { font-size: 18px; line-height: 1.6; color: #a7adba; }
+.home-marketing .muted { color: #a7adba; }
+.home-marketing .section { padding-block: 80px; }
+.home-marketing .section-tight { padding-block: 48px; }
+
+/* ---- beginning / hero ---- */
+.home-marketing .begin { position: relative; overflow: hidden; padding-top: 8px; }
+.home-marketing .begin-back {
+  position: absolute; top: -12%; left: -8%;
+  width: 116%; height: 124%; max-width: none;
+  object-fit: cover; opacity: .85; pointer-events: none; will-change: transform;
+}
+.home-marketing .begin-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg,
+    #0c0d10 0%, #0c0d10 34%, rgba(12,13,16,.90) 52%, rgba(12,13,16,.62) 100%);
+  pointer-events: none;
+}
+.home-marketing .begin-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr);
+  gap: 64px; align-items: center; padding-block: 64px 48px;
+}
+.home-marketing .begin h1 {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
+  font-size: clamp(38px, 5.4vw, 68px); line-height: .99; letter-spacing: -0.028em;
+  color: #f4f5f7;
+}
+.home-marketing .begin-lede { margin-top: 24px; font-size: 18.5px; line-height: 1.58; color: #a7adba; max-width: 540px; }
+.home-marketing .begin-note { margin-top: 24px; font-size: 13.5px; color: #6b7280; }
+.home-marketing .begin-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.home-marketing .pill-live {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+  color: #ffcb05; border: 1px solid #55490f; border-radius: 999px;
+  padding: 7px 15px; margin-bottom: 24px;
+}
+.home-marketing .pill-live::before {
+  content: ""; width: 6px; height: 6px; border-radius: 999px; background: #ffcb05;
+}
+
+.home-marketing .number-card {
+  background: #16181d; color: #f4f5f7; border: 1px solid #2b2f38;
+  border-radius: 16px; padding: 30px 32px;
+}
+.home-marketing .number-card .total {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-size: clamp(52px, 5vw, 74px); font-weight: 600;
+  line-height: 1; letter-spacing: -0.025em; margin-top: 12px;
+}
+.home-marketing .number-card hr { border: 0; border-top: 1px solid #2b2f38; margin: 24px 0; }
+.home-marketing .split-row { display: flex; align-items: center; gap: 12px; }
+.home-marketing .split-row + .split-row { margin-top: 15px; }
+.home-marketing .split-row .swatch { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+.home-marketing .swatch-green { background: #ffcb05; }
+.home-marketing .swatch-grey { background: #6b7280; }
+.home-marketing .split-row .label { flex: 1; font-size: 14px; }
+.home-marketing .split-row .amount { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 16px; font-weight: 600; }
+.home-marketing .deadline-note {
+  display: flex; align-items: center; gap: 10px;
+  background: #e0533d1f; border: 1px solid #e0533d55; border-radius: 9px;
+  padding: 13px 15px; margin-top: 24px; font-size: 13px; font-weight: 600; color: #ff9b87;
+}
+
+/* ---- stat strip ---- */
+.home-marketing .stat-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #2b2f38; padding-block: 32px;
+}
+.home-marketing .stat-strip > div + div { border-left: 1px solid #2b2f38; padding-left: 48px; }
+.home-marketing .stat-strip .value { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 30px; font-weight: 600; }
+.home-marketing .stat-strip .label { font-size: 13.5px; color: #a7adba; margin-top: 4px; }
+
+/* ---- how it works ---- */
+.home-marketing .steps { position: relative; }
+.home-marketing .steps::before {
+  content: ""; position: absolute; left: 8px; right: 8px; top: 65px;
+  height: 1px; background: #2b2f38;
+}
+.home-marketing .steps-grid { position: relative; display: grid; grid-template-columns: repeat(3,1fr); gap: 48px; }
+.home-marketing .step .num {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 58px;
+  line-height: 1; color: #ffcb05; letter-spacing: -0.02em;
+}
+.home-marketing .step .dot {
+  width: 17px; height: 17px; border-radius: 999px; background: #ffcb05;
+  border: 4px solid #0c0d10; margin-top: 17px;
+}
+.home-marketing .step h3 { font-size: 21px; margin-top: 24px; margin-bottom: 9px; }
+.home-marketing .step p { font-size: 15px; line-height: 1.62; color: #a7adba; max-width: 340px; }
+
+/* ---- sources ---- */
+.home-marketing .card { background: #16181d; border: 1px solid #2b2f38; border-radius: 12px; padding: 24px; }
+.home-marketing .card-dark { background: #1e2128; border-color: #2b2f38; color: #f4f5f7; }
+.home-marketing .card-dark p { color: #a7adba; }
+.home-marketing .source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+.home-marketing .source-card { padding: 30px 28px 28px; border-radius: 14px; }
+.home-marketing .source-card:nth-child(2) { margin-top: 56px; }
+.home-marketing .source-card:nth-child(3) { margin-top: 24px; }
+.home-marketing .source-card .rule { width: 34px; height: 3px; border-radius: 2px; background: #ffcb05; }
+.home-marketing .card-dark .rule { background: #ffd93d; }
+.home-marketing .source-card:nth-child(3) .rule { background-color: #e0533d; }
+.home-marketing .source-card .amount {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 42px;
+  line-height: 1; letter-spacing: -0.02em; margin-top: 20px;
+}
+.home-marketing .source-card .amount small { font-size: 22px; color: #a7adba; }
+
+/* ---- goal ---- */
+.home-marketing .goal { border-top: 1px solid #2b2f38; padding-top: 48px; }
+.home-marketing .goal h2 {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15; letter-spacing: -0.02em; max-width: 900px;
+}
+.home-marketing .goal-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 32px; }
+.home-marketing .goal-cols p { font-size: 16px; line-height: 1.65; color: #a7adba; }
+
+/* ---- closing ---- */
+.home-marketing .closing { background: #ffcb05; color: #000; text-align: center; padding-block: 80px; }
+.home-marketing .closing h2 {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400;
+  font-size: clamp(32px, 4.2vw, 52px); line-height: 1; letter-spacing: -0.025em; color: #000;
+}
+.home-marketing .closing p { margin: 16px auto 32px; font-size: 17px; color: rgba(0,0,0,.72); max-width: 520px; }
+.home-marketing .closing .btn-invert { background: #000; border-color: #000; color: #ffcb05; }
+.home-marketing .closing .btn-invert:hover { background: #16181d; border-color: #16181d; color: #ffd93d; }
+
+/* ---- buttons (scoped copy of the marketing site's button.css) ---- */
+.home-marketing .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 14px; font-weight: 600; border-radius: 8px; padding: 10px 18px;
+  border: 1px solid transparent; min-height: 44px;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.home-marketing .btn-lg { font-size: 16px; padding: 15px 30px; border-radius: 10px; }
+.home-marketing .btn-primary { background: #ffcb05; border-color: #ffcb05; color: #000; }
+.home-marketing .btn-primary:hover { background: #ffd93d; border-color: #ffd93d; color: #000; }
+.home-marketing .btn-onDark { background: transparent; border-color: #2b2f38; color: #f4f5f7; font-weight: 500; }
+.home-marketing .btn-onDark:hover { border-color: #ffcb05; color: #ffcb05; }
+.home-marketing .btn-invert { background: #ffcb05; border-color: #ffcb05; color: #000; }
+.home-marketing .btn-invert:hover { background: #ffd93d; color: #000; }
+
+/* ---- scroll-reveal / count-up motion, driven from a useEffect in Home.jsx ---- */
+.home-marketing .reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1);
+}
+.home-marketing .reveal.in { opacity: 1; transform: none; }
+.home-marketing .reveal-scale {
+  opacity: 0; transform: scale(.96);
+  transition: opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+}
+.home-marketing .reveal-scale.in { opacity: 1; transform: none; }
+
+@media (max-width: 900px) {
+  .home-marketing .section { padding-block: 56px; }
+  .home-marketing .begin-inner { grid-template-columns: 1fr; gap: 48px; padding-block: 40px; }
+  .home-marketing .steps-grid { grid-template-columns: 1fr; gap: 32px; }
+  .home-marketing .steps::before { display: none; }
+  .home-marketing .source-grid { grid-template-columns: 1fr; }
+  .home-marketing .source-card:nth-child(2), .home-marketing .source-card:nth-child(3) { margin-top: 0; }
+  .home-marketing .goal-cols { grid-template-columns: 1fr; gap: 24px; }
+  .home-marketing .stat-strip { grid-template-columns: 1fr; gap: 24px; }
+  .home-marketing .stat-strip > div + div { border-left: 0; padding-left: 0; border-top: 1px solid #2b2f38; padding-top: 24px; }
+}
