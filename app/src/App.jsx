@@ -89,7 +89,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <button className="brand" onClick={goHome}>
-          <span className="brand-mark" aria-hidden="true">⚡</span>
+          <img className="brand-mark" src="/images/icon.png" alt="" aria-hidden="true" />
           <span className="brand-name">Charge&nbsp;Up Savings</span>
         </button>
         <nav className="tabs" aria-label="Primary">
@@ -180,7 +180,7 @@ function AccountPanel({ user, storageAllowed, onStorageAllowedChange }) {
     setSigningOut(true)
     try {
       await signOut(auth)
-      window.location.href = '/login.html'
+      window.location.href = '/index.html'
     } catch (err) {
       console.error('LOGOUT ERROR:', err)
       setSigningOut(false)
