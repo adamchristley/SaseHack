@@ -39,7 +39,7 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
       try {
         await setDoc(
           doc(db, "users", cred.user.uid),
-          { storeData: true, email: cred.user.email, consentAt: Date.now() },
+          { storeData: true, email: cred.user.email, consentAt: Date.now(), emailOptIn: false },
           { merge: true }
         );
       } catch (err) {
