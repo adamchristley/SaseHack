@@ -1,7 +1,7 @@
 /*
  * Scholarship digest email, run by GitHub Actions (.github/workflows/scholarship-digest.yml).
  *
- * For every user with emailOptIn == true and a saved profile, it emails their best
+ * For every user with storeData == true and a saved profile, it emails their best
  * scholarship matches, but only if they haven't been emailed within MIN_MINUTES_BETWEEN
  * minutes (tracked in users/{uid}.lastDigestAt). That is what lets the workflow run often
  * without spamming anyone: the schedule decides when we LOOK, this decides who is DUE.
@@ -77,7 +77,7 @@ if (!DRY_RUN) {
 const mode = [DRY_RUN && 'DRY RUN', ONLY_EMAIL && 'test address only', `min ${MIN_MINUTES} min between emails`].filter(Boolean).join(', ')
 console.log(`Digest run started (${mode}).`)
 
-const snap = await db.collection('users').where('emailOptIn', '==', true).get()
+const snap = await db.collection('users').where('storeData', '==', true).get()
 console.log(`Found ${snap.size} opted-in user(s).`)
 
 let sent = 0
