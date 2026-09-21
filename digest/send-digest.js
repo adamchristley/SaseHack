@@ -55,7 +55,9 @@ if (!DRY_RUN) {
 const mode = [DRY_RUN && 'DRY RUN', ONLY_EMAIL && 'test address only', `min ${MIN_MINUTES} min between emails`].filter(Boolean).join(', ')
 console.log(`Digest run started (${mode}).`)
 
-const snap = await db.collection('users').where('storeData', '==', true).get()
+// emailOptIn is the "email me my matches" checkbox on the account page; storeData
+// is the separate consent to keep the profile at all, checked per user below.
+const snap = await db.collection('users').where('emailOptIn', '==', true).get()
 console.log(`Found ${snap.size} opted-in user(s).`)
 
 let sent = 0
@@ -68,6 +70,7 @@ for (const docSnap of snap.docs) {
   try {
     const data = docSnap.data()
 
+    if (!data.storeData) { skipped++; console.log(`${label}: skipped (profile storage turned off)`); continue }
     if (!data.profile) { skipped++; console.log(`${label}: skipped (no saved profile yet)`); continue }
     if (!isDue(data.lastDigestAt, Date.now(), MIN_MINUTES)) { skipped++; console.log(`${label}: skipped (emailed recently)`); continue }
 
