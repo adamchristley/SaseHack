@@ -1,8 +1,8 @@
-// One ranked scholarship match. Eligibility reasons come from deterministic
-// rule signals. Optional retrieval diagnostics expose how hybrid search ranked it.
+// One scholarship match. The UI shows user-facing eligibility reasons only;
+// retrieval and ranking diagnostics stay out of the normal product experience.
 
 export default function ScholarshipCard({ match, rank }) {
-  const { scholarship: s, score, reasons, retrieval, eligibility } = match
+  const { scholarship: s, reasons, eligibility } = match
   const deadline = formatDeadline(s.deadline, s.recurring)
   const unresolved = eligibility?.status === 'needs_info'
 
@@ -16,11 +16,6 @@ export default function ScholarshipCard({ match, rank }) {
         </div>
         <div className="sch-amount">
           <span className="savings-num">{formatAmount(s)}</span>
-          {!unresolved && (
-            <span className="score" title={retrieval ? 'Hybrid retrieval score' : 'Deterministic match score'}>
-              score {score}
-            </span>
-          )}
         </div>
       </div>
 
@@ -43,21 +38,6 @@ export default function ScholarshipCard({ match, rank }) {
         </ul>
       )}
 
-      {retrieval && (
-        <details className="retrieval-details">
-          <summary>{unresolved ? 'Why we retrieved this' : 'Why it ranked here'}</summary>
-          <div className="retrieval-metrics">
-            <Metric label="Eligibility rules" value={retrieval.rule_score} />
-            <Metric label="BM25" value={retrieval.lexical_score} />
-            <Metric
-              label="Semantic similarity"
-              value={retrieval.semantic_similarity == null ? 'local' : retrieval.semantic_similarity}
-            />
-            <Metric label="RRF" value={retrieval.rrf_score} />
-          </div>
-        </details>
-      )}
-
       <div className="card-foot">
         <a className="src-link" href={s.source_url} target="_blank" rel="noreferrer noopener">
           Official source ↗
@@ -65,15 +45,6 @@ export default function ScholarshipCard({ match, rank }) {
         <span className={'deadline deadline--' + deadline.level}>{deadline.label}</span>
       </div>
     </article>
-  )
-}
-
-function Metric({ label, value }) {
-  return (
-    <div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
   )
 }
 
