@@ -3,7 +3,8 @@
     top: 0;
     z-index: 50;
     height: 64px;
-    background: #1B6B4A;
+    background: #0c0d10;
+    border-bottom: 1px solid #2b2f38;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -19,11 +20,11 @@
 
 .brand-name {
     font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: 26px;
-    color: #FBFAF6; letter-spacing: -0.01em;
+    color: #f4f5f7; letter-spacing: -0.01em;
 }
 .campus-chip {
-    font-size: 12px; font-weight: 500; color: #D6E6DC;
-    border: 1px solid #47876B; border-radius: 999px;
+    font-size: 12px; font-weight: 500; color: #a7adba;
+    border: 1px solid #2b2f38; border-radius: 999px;
     padding: 4px 11px; white-space: nowrap;
 }
 
@@ -35,7 +36,7 @@
 .unclaimed {
     font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
     font-size: 26px;
-    color: #FBFAF6;
+    color: #f4f5f7;
     letter-spacing: -0.01em;
 }
 
@@ -48,22 +49,22 @@
     font-weight: 500;
 }
 
-.site-nav a {color: #D6E6DC;}
-.site-nav a:hover {color: #FBFAF6;}
-.site-nav a[aria-current="page"] {color: #FBFAF6; font-weight: 600;}
+.site-nav a {color: #a7adba;}
+.site-nav a:hover {color: #f4f5f7;}
+.site-nav a[aria-current="page"] {color: #ffcb05; font-weight: 600;}
 
 .header-login {
     font-size: 14.5px;
     font-weight: 500;
-    color: #D6E6DC;
+    color: #a7adba;
     margin-left: 10px;
 }
 
-.header-login:hover {color: #FBFAF6;}
+.header-login:hover {color: #f4f5f7;}
 
 .avatar {
     width: 32px; height: 32px; border-radius: 999px;
-    background: #FBFAF6; color: #124D26;
+    background: #ffcb05; color: #000000;
     display: grid; place-items: center;
     font-size: 12.5px; font-weight: 700;
     margin-left: 12px;
@@ -72,24 +73,39 @@
 .header-cta {
     font-size: 14px;
     font-weight: 600;
-    color: #124D36;
-    background: #FBFAF6;
+    color: #000000;
+    background: #ffcb05;
     border-radius: 8px;
     padding: 9px 22px;
     white-space: nowrap;
 }
 
 .header-cta:hover {
-    color: #124D36;
-    background: #FFFFFF;
+    color: #000000;
+    background: #ffd93d;
 }
 
 .nav-toggle {
     display: none;
     background: none;
-    border: 1px solid #47876B;
+    border: 1px solid #2b2f38;
     border-radius: 8px;
     padding: 6px 10px;
-    color: #FBFAF6;
+    color: #f4f5f7;
 }
 
+@media (max-width: 720px) {
+    .site-header { padding-inline: 16px; gap: 8px; }
+    .nav-toggle { display: inline-block; margin-left: auto; }
+    .site-nav {
+        display: none;
+        position: absolute; top: 64px; left: 0; right: 0;
+        flex: none; flex-direction: column; align-items: stretch;
+        justify-content: flex-start; gap: 0;
+        background: #0c0d10; padding: 8px 16px 16px;
+        border-bottom: 1px solid #2b2f38;
+    }
+    .site-nav.is-open { display: flex; }
+    .site-nav a { padding: 12px 0; }
+    .header-login { display: none; }
+}
