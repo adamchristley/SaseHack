@@ -54,12 +54,47 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
           />
         </Field>
 
-        <Field label="State" hint="2-letter">
+        <Field label="Residency state" hint="2-letter, confirm manually">
           <input
             value={profile.state || ''}
             onChange={(e) => set({ state: e.target.value.toUpperCase().slice(0, 2) || null })}
             placeholder="MI"
           />
+        </Field>
+
+        <Field label="Age">
+          <input
+            type="number" min="13" max="100"
+            value={profile.age ?? ''}
+            onChange={(e) => set({ age: e.target.value === '' ? null : Number(e.target.value) })}
+            placeholder="21"
+          />
+        </Field>
+
+        <Field label="Citizenship / residency">
+          <select
+            value={profile.citizenship || ''}
+            onChange={(e) => set({ citizenship: e.target.value || null })}
+          >
+            <option value="">Unknown / not answered</option>
+            <option value="us_citizen">U.S. citizen</option>
+            <option value="us_national">U.S. national</option>
+            <option value="permanent_resident">Permanent resident</option>
+            <option value="other">Other</option>
+          </select>
+        </Field>
+
+        <Field label="Graduate study plans" wide>
+          <select
+            value={profile.graduate_plan || ''}
+            onChange={(e) => set({ graduate_plan: e.target.value || null })}
+          >
+            <option value="">Unknown / not answered</option>
+            <option value="phd">Plan to pursue a PhD</option>
+            <option value="research_grad">Plan research-based master's or PhD</option>
+            <option value="other_grad">Other graduate/professional study</option>
+            <option value="none">No graduate study planned</option>
+          </select>
         </Field>
 
         <Field label="School" wide>
@@ -70,11 +105,11 @@ export default function ProfilePanel({ profile, onChange, onLoadSample, onClear 
           />
         </Field>
 
-        <Field label="Affiliations" hint="SASE, first-generation, veteran…" wide>
+        <Field label="Affiliations / eligibility groups" hint="only add what you want to self-declare" wide>
           <input
             value={fromList(profile.affiliations)}
             onChange={(e) => set({ affiliations: toList(e.target.value) })}
-            placeholder="SASE, first-generation"
+            placeholder="SASE, veteran, first-generation"
           />
         </Field>
 
