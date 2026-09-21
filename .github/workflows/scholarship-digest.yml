@@ -2,7 +2,7 @@ name: Scholarship Digest
 
 on:
   schedule:
-    - cron: '*/5 * * * *'      # PRODUCTION: '0 14 * * 1'  (Mondays 14:00 UTC = 10:00 Eastern in summer)
+    - cron: '0 14 * * 1'      
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,18 +24,14 @@ on:
 
 permissions:
   contents: read
-
-# Never let two digest runs overlap; the next one waits its turn.
 concurrency:
   group: scholarship-digest
   cancel-in-progress: false
 
 env:
-  # TEST MODE (current)                 # PRODUCTION
-  MIN_MINUTES_BETWEEN: '1'              # '10080'   (one week)
-  PASSES_PER_RUN: '5'                   # '1'
-  ONLY_EMAIL: 'mwood8603@gmail.com'                        # ''        <- put YOUR address here while testing
-
+  MIN_MINUTES_BETWEEN: '1'             
+  PASSES_PER_RUN: '1'                  
+  ONLY_EMAIL: ''                       
 jobs:
   send-digest:
     runs-on: ubuntu-latest
