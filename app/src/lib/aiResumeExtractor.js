@@ -1,20 +1,107 @@
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  Schema,
+} from 'firebase/ai'
+import { getFirebaseAIApp } from './firebaseAI.js'
+
 const MIN_CONFIDENCE = 0.55
+const MODEL = 'gemini-3.1-flash-lite'
+const MAX_TEXT_CHARS = 30000
+
+const factString = Schema.object({
+  properties: {
+    value: Schema.string(),
+    evidence: Schema.string(),
+    confidence: Schema.number(),
+  },
+})
+
+const maybeString = Schema.object({
+  properties: {
+    value: Schema.string(),
+    evidence: Schema.string(),
+    confidence: Schema.number(),
+  },
+  optionalProperties: ['value', 'evidence'],
+})
+
+const maybeNumber = Schema.object({
+  properties: {
+    value: Schema.number(),
+    evidence: Schema.string(),
+    confidence: Schema.number(),
+  },
+  optionalProperties: ['value', 'evidence'],
+})
+
+const responseSchema = Schema.object({
+  properties: {
+    majors: Schema.array({ items: factString }),
+    year_level: maybeString,
+    gpa: maybeNumber,
+    state: maybeString,
+    school: maybeString,
+    affiliations: Schema.array({ items: factString }),
+    skills: Schema.array({ items: factString }),
+    interests: Schema.array({ items: factString }),
+    work_experience: Schema.array({ items: factString }),
+  },
+})
 
 export async function analyzeResumeWithAI(text) {
-  const response = await fetch('/api/resume-analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text }),
-  })
-
-  const payload = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    const error = new Error(payload.error || 'AI resume analysis failed.')
-    error.code = payload.code || 'AI_ANALYSIS_FAILED'
-    throw error
+  const resumeText = String(text || '').trim()
+  if (!resumeText) throw new Error('Resume text is required.')
+  if (resumeText.length > MAX_TEXT_CHARS) {
+    throw new Error('Resume text is too long for AI extraction.')
   }
 
-  return verifiedProfileFromAnalysis(text, payload.analysis, payload.model)
+  const firebaseApp = getFirebaseAIApp()
+  const ai = getAI(firebaseApp, { backend: new GoogleAIBackend() })
+  const model = getGenerativeModel(ai, {
+    model: MODEL,
+    generationConfig: {
+      temperature: 0.05,
+      maxOutputTokens: 3500,
+      responseMimeType: 'application/json',
+      responseSchema,
+    },
+  })
+
+  const prompt = `
+Extract a scholarship-search profile from the resume below.
+
+Rules:
+- Use only facts supported by the resume.
+- Every non-null fact must include a short evidence quote from the resume.
+- If a scalar fact is unsupported, omit value and evidence for that scalar.
+- Normalize majors to common degree names.
+- year_level must be freshman, sophomore, junior, senior, grad, or unsupported.
+- You may derive year_level from an explicit expected graduation date relative to September 2026. If graduation is Apr/May 2027, use senior. Include the graduation text as evidence.
+- Only return GPA when explicitly stated.
+- state means the student's residency/home state for scholarship eligibility. Do not use a school location or employer location as residency.
+- Affiliations must be explicitly stated organizations, programs, or statuses.
+- Do not infer demographic or other sensitive personal attributes.
+- Skills must be concrete and resume-supported.
+- Interests may summarize clearly supported project or research areas.
+- work_experience should contain concise role or experience labels.
+- confidence measures support in the resume, not scholarship eligibility.
+- Do not decide scholarship eligibility and do not create scholarship names.
+
+RESUME:
+<<<
+${resumeText}
+>>>
+`.trim()
+
+  try {
+    const result = await withRetry(() => model.generateContent(prompt))
+    const analysis = JSON.parse(result.response.text())
+    return verifiedProfileFromAnalysis(resumeText, analysis, MODEL)
+  } catch (error) {
+    throw friendlyFirebaseAIError(error)
+  }
 }
 
 export function verifiedProfileFromAnalysis(resumeText, analysis, model = 'unknown') {
@@ -107,7 +194,6 @@ export function evidenceSupported(resumeText, evidence) {
   if (!needle) return false
   if (haystack.includes(needle)) return true
 
-  // PDF text extraction sometimes changes punctuation and line breaks.
   const tokens = needle.split(' ').filter((token) => token.length >= 2)
   return tokens.length >= 2 && tokens.every((token) => haystack.includes(token))
 }
@@ -142,4 +228,48 @@ function countValues(profile) {
     if (Array.isArray(value)) return count + value.length
     return count + (value == null ? 0 : 1)
   }, 0)
+}
+
+async function withRetry(operation) {
+  let lastError
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error
+      if (attempt === 2 || !isRetryable(error)) throw error
+      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 800 : 1800))
+    }
+  }
+
+  throw lastError
+}
+
+function isRetryable(error) {
+  const code = String(error?.code || '')
+  const message = String(error?.message || '')
+  return (
+    /fetch|network|timeout|unavailable|quota|resource.?exhausted/i.test(message) ||
+    /fetch-error|request-error/i.test(code)
+  )
+}
+
+function friendlyFirebaseAIError(error) {
+  const code = String(error?.code || '')
+  const message = error instanceof Error ? error.message : String(error || 'Firebase AI request failed')
+
+  if (/app.?check|attestation|permission.?denied|403/i.test(message)) {
+    return new Error('Firebase App Check blocked the AI request. Configure the production App Check site key and rebuild.')
+  }
+
+  if (/quota|resource.?exhausted|429/i.test(message)) {
+    return new Error('Gemini free-tier quota is temporarily exhausted. Retry in a moment.')
+  }
+
+  if (/no-api-key|api-not-enabled/i.test(code) || /api.+not enabled/i.test(message)) {
+    return new Error('Firebase AI Logic is not fully enabled for this Firebase project.')
+  }
+
+  return error instanceof Error ? error : new Error(message)
 }
