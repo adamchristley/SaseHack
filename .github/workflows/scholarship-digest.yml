@@ -1,0 +1,70 @@
+name: Scholarship Digest
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'      # PRODUCTION: '0 14 * * 1'  (Mondays 14:00 UTC = 10:00 Eastern in summer)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Show who would be emailed, but send nothing'
+        type: boolean
+        default: false
+      only_email:
+        description: 'Only email this address (blank = use the value in the workflow file)'
+        type: string
+        required: false
+      min_minutes:
+        description: 'Skip people emailed in the last N minutes (0 = always send; blank = workflow default)'
+        type: string
+        required: false
+      passes:
+        description: 'How many times to run, one minute apart (blank = workflow default)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+# Never let two digest runs overlap; the next one waits its turn.
+concurrency:
+  group: scholarship-digest
+  cancel-in-progress: false
+
+env:
+  # TEST MODE (current)                 # PRODUCTION
+  MIN_MINUTES_BETWEEN: '1'              # '10080'   (one week)
+  PASSES_PER_RUN: '5'                   # '1'
+  ONLY_EMAIL: 'mwood8603@gmail.com'                        # ''        <- put YOUR address here while testing
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: digest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+
+      - name: Send digests
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SITE_URL: https://login-sasehack.web.app
+          MIN_MINUTES_BETWEEN: ${{ inputs.min_minutes || env.MIN_MINUTES_BETWEEN }}
+          ONLY_EMAIL: ${{ inputs.only_email || env.ONLY_EMAIL }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          PASSES: ${{ inputs.passes || env.PASSES_PER_RUN }}
+        run: |
+          failed=0
+          for i in $(seq 1 "$PASSES"); do
+            echo "=== pass $i of $PASSES ==="
+            node send-digest.js || failed=1
+            if [ "$i" -lt "$PASSES" ]; then sleep 60; fi
+          done
+          exit $failed

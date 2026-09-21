@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title> Unclaimed</title>
-        <link rel="icon" href="images/icon.png" type="image/png">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap">
@@ -15,7 +15,6 @@
         <link rel="stylesheet" href="styles/motion.css">
         <link rel="stylesheet" href="styles/card.css">
         <link rel="stylesheet" href="styles/end.css">
-        
 
     </head>
 
@@ -23,9 +22,10 @@
     <!--Header-->
     <header class="site-header">
 
-        <a class="brand" href="index.html">
-            <span class="brand-mark" aria-hidden="true">⚡</span>
-            <span>Charge&nbsp;Up Savings</span>
+        <a class="brand" href="index.html">       
+                <img class="icon"
+                src="images/icon.png">
+                <span class="unclaimed"> Unclaimed</span>
         </a>
 
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
@@ -38,22 +38,22 @@
     </nav>
 
     <a class="header-login" href="login.html">Log in</a>
-    <a class="btn btn-invert btn-sm header-cta" href="upload.html">Start</a>
+    <a class="btn btn-invert btn-sm header-cta" href="index.html">Start</a>
     </header>
         
     <main>
     <!--------beginning---------->
           <section class="begin">
-            <img class="begin-back" src="images/paper-background.png" alt="" aria-hidden="true">
+            <img class="begin-back" src="images/hampter.jpg" alt="" aria-hidden="true">
             <div class="begin-scrim"></div>
 
             <div class="wrap begin-inner">
                 <div class="reveal">
-                    <span class="pill-live">Live for Michigan Technological University</span>
-                    <h1>The money nobody tells you about</h1>
+                    <span class="pill-live">Live for Michigan Technological Univserity</span>
+                    <h1>The money nobody tells you about.</h1>
                     <p class="begin-lede">Students are eligible for money they never claim, because it is buried in documents nobody reads. Upload your resume and we will show you what you may be missing out on!</p>
                     <div class="begin-actions">
-                        <a class="btn btn-primary btn-lg" href="upload.html">Find my number</a>
+                        <a class="btn btn-primary btn-lg" href="dashboard.html">Find my number</a>
                         <a class="btn btn-onDark btn-lg" href="#how">See how it works</a>
                     </div>
                     <p class="begin-note"> Free of cost, takes about a minute,and every figure links to the page it came from.</p>
@@ -108,7 +108,7 @@
                             <div class="num">02</div>
                             <div class="dot"></div>
                             <h3>Answer eight questions</h3>
-                            <p>Residency, first-generation, whether you are on a parent's insurance. The things that decide eligibility and never appear on a resume.</p>
+                            <p>Residency, first-generation, whether you are on a parent's insurance. The things that decide eligibility adn never appear on a resume.</p>
                         </div>
                         <div class="step reveal" data-delay="2">
                             <div class="num">03</div>
@@ -138,7 +138,7 @@
 
                     <article class="card-dark source-card reveal" data-delay="1">
                         <div class="rule"></div>
-                        <div class="amount">$300<span style="color:#16181d">&ndash;</span>900<small style="color:#16181d"> a year</small></div>
+                        <div class="amount">$300<span class="muted">&ndash;</span>900<small> a year</small></div>
                         <h3>Discounts around campus</h3>
                         <p>The pool, barber, bus pass, mueseums. Find student discounts that could save you hundreds.</p>
                     </article>
@@ -172,7 +172,7 @@
         <div class="wrap">
             <h2>Find out what you are owed.</h2>
             <p>It costs nothing, it takes about ninety seconds, and you can delete everything afterwards.</p>
-            <a class="btn btn-invert btn-lg" href="upload.html">Upload my resume</a>
+            <a class="btn btn-invert btn-lg" href="dashboard.html">Upload my resume</a>
         </div>
     </section>
     </main>
@@ -191,12 +191,19 @@
     </div>
 
     <script src="scroll.js" defer></script>
-    <!--<script type="module">
-        import { auth } from "./firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-        onAuthStateChanged(auth, (user) => {
-            window.location = user && user.emailVerified ? "dashboard.html" : "login.html";
-        });
-    </script>-->
+<script type="module">
+  import { auth } from "./firebase-config.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    
+    if (!user || !user.emailVerified) return;
+
+    const link = document.querySelector(".header-login");
+    link.textContent = "Hi, " + (user.displayName || user.email);
+    link.href = "index.html";
+    link.title = "Open my dashboard";
+  });
+</script>
     </body>
 </html>

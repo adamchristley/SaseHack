@@ -1,0 +1,83 @@
+[debug] [2026-09-20T19:57:37.447Z] ----------------------------------------------------------------------
+[debug] [2026-09-20T19:57:37.452Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\mwood\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2026-09-20T19:57:37.452Z] CLI Version:   15.30.2
+[debug] [2026-09-20T19:57:37.453Z] Platform:      win32
+[debug] [2026-09-20T19:57:37.453Z] Node Version:  v24.21.0
+[debug] [2026-09-20T19:57:37.453Z] Detected Agent: unknown
+[debug] [2026-09-20T19:57:37.453Z] Time:          Sun Sep 20 2026 15:57:37 GMT-0400 (Eastern Daylight Time)
+[debug] [2026-09-20T19:57:37.453Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\mwood
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-09-20T19:58:32.401Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-20T19:58:32.401Z] > authorizing via signed-in user (maxwellw@mtu.edu)
+[debug] [2026-09-20T19:58:32.431Z] Checked if tokens are valid: false, expires at: 1789934408956
+[debug] [2026-09-20T19:58:32.432Z] Checked if tokens are valid: false, expires at: 1789934408956
+[debug] [2026-09-20T19:58:32.432Z] > refreshing access token with scopes: []
+[debug] [2026-09-20T19:58:32.437Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-09-20T19:58:32.437Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-20T19:58:32.751Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-09-20T19:58:32.752Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-20T19:58:32.779Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/login-sasehack [none]
+[debug] [2026-09-20T19:58:33.180Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/login-sasehack 200
+[debug] [2026-09-20T19:58:33.180Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/login-sasehack {"projectId":"login-sasehack","projectNumber":"480797784311","displayName":"MTU-Sasehack","name":"projects/login-sasehack","resources":{"hostingSite":"login-sasehack"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_bdaa32f7-f026-42b1-84d3-2fcfd42a9722"}
+[info] i  Using project login-sasehack (MTU-Sasehack) . 
+[info] 
+=== Functions Setup
+[debug] [2026-09-20T19:58:33.203Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-20T19:58:33.204Z] > authorizing via signed-in user (maxwellw@mtu.edu)
+[debug] [2026-09-20T19:58:33.206Z] [iam] checking project login-sasehack for permissions ["firebase.projects.get"]
+[debug] [2026-09-20T19:58:33.207Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.207Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.207Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/login-sasehack:testIamPermissions [none]
+[debug] [2026-09-20T19:58:33.208Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/login-sasehack:testIamPermissions  x-goog-user-project=login-sasehack
+[debug] [2026-09-20T19:58:33.208Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/login-sasehack:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-09-20T19:58:33.646Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/login-sasehack:testIamPermissions 200
+[debug] [2026-09-20T19:58:33.646Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/login-sasehack:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-09-20T19:58:33.649Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.649Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.650Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.650Z] Checked if tokens are valid: true, expires at: 1789937911752
+[debug] [2026-09-20T19:58:33.651Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/cloudfunctions.googleapis.com [none]
+[debug] [2026-09-20T19:58:33.651Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/cloudfunctions.googleapis.com  x-goog-user-project=login-sasehack
+[debug] [2026-09-20T19:58:33.653Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/runtimeconfig.googleapis.com [none]
+[debug] [2026-09-20T19:58:33.653Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/runtimeconfig.googleapis.com  x-goog-user-project=login-sasehack
+[debug] [2026-09-20T19:58:34.553Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/runtimeconfig.googleapis.com 200
+[debug] [2026-09-20T19:58:34.554Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2026-09-20T19:58:34.568Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/cloudfunctions.googleapis.com 200
+[debug] [2026-09-20T19:58:34.568Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/login-sasehack/services/cloudfunctions.googleapis.com [omitted]
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+
+[info] +  Wrote functions/.eslintrc.js 
+[info] +  Wrote functions/package.json 
+[info] +  Wrote functions/index.js 
+[info] +  Wrote functions/.gitignore 
+[info] 
+=== Agent Skills Setup
+[info] If you are using an AI coding agent, Firebase Agent Skills make it an expert at Firebase.
